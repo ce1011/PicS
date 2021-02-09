@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
-import 'package:flutter/services.dart';
 
 class RegisterPageName extends StatelessWidget {
   TextEditingController email, password, firstName, lastName;
@@ -56,7 +55,7 @@ class RegisterPageName extends StatelessWidget {
             Container(
               child: RaisedButton(
                 child: Text("Next"),onPressed: (){
-                Navigator.pushNamed(context, "/register/processing");
+                Navigator.pushNamedAndRemoveUntil(context, "/register/processing", (route) => false);
               },
               ),
             )

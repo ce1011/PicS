@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pics/main.dart';
 import 'package:provider/provider.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import '../provider/LoginStateNotifier.dart';
-import 'package:http/http.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController accountInputController =
