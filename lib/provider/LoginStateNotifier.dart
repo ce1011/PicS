@@ -3,13 +3,13 @@ import 'package:flutter/foundation.dart';
 class LoginStateNotifier with ChangeNotifier {
   bool _login = false;
   int accountID;
-  String name,account;
-
+  String name = "dick",account;
 
   bool get loginState => _login;
 
-  login() {
+  login(String name) {
     _login = true;
+    this.name = name;
     notifyListeners();
   }
 
