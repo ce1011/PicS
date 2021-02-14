@@ -16,11 +16,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedHomePage = 0;
+  List<Widget> widgetList = <Widget>[HomePagePost(), HomePageProfile()];
+
+  /*
   List<Widget> widgetList = <Widget>[
     HomePagePost(),
     HomePageSearch(),
     HomePageProfile()
   ];
+  */
 
   void onTap(int index) {
     setState(() {
@@ -55,14 +59,17 @@ class _HomePageState extends State<HomePage> {
               fontWeight: FontWeight.bold,
             )),
         actions: [
-          IconButton(
-              icon: Icon(Icons.chat),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SelectChatPage()),
-                );
-              })
+          (Provider.of<LoginStateNotifier>(context, listen: false).loginState ==
+                  true)
+              ? IconButton(
+                  icon: Icon(Icons.chat),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SelectChatPage()),
+                    );
+                  })
+              : Container()
         ],
       ),
       body: Container(
@@ -78,7 +85,6 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.post_add), label: "Post"),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
             BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile")
           ],
           currentIndex: selectedHomePage,
@@ -87,16 +93,20 @@ class _HomePageState extends State<HomePage> {
           showUnselectedLabels: false,
           type: BottomNavigationBarType.fixed,
           elevation: 0),
-      floatingActionButton: (selectedHomePage == 0 && Provider.of<LoginStateNotifier>(context, listen: false).loginState ==
-          true) ? FloatingActionButton(
-        child: Icon(Icons.post_add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => PickImagePage()),
-          );
-        },
-      ): null,
+      floatingActionButton:
+          (Provider.of<LoginStateNotifier>(context, listen: false).loginState ==
+                  true)
+              ? FloatingActionButton(
+                  child: Icon(Icons.post_add),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PickImagePage()),
+                    );
+                  },
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

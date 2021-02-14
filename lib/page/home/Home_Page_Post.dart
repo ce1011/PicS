@@ -74,9 +74,9 @@ class _HomePagePostState extends State<HomePagePost> {
                         ListTile(
                           dense: true,
                           leading: CircleIcon(
-                              url: "https://i.imgur.com/BoN9kdC.png"),
-                          title: Text("DLLM"),
-                          subtitle: Text("Posted at 31 Feb 2021 23:59"),
+                              url: "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl-2.jpg"),
+                          title: Text("Silly"),
+                          subtitle: Text("Posted at 25 Feb 2020 12:00"),
                         ),
                         Divider(
                           color: Colors.greenAccent[400],
