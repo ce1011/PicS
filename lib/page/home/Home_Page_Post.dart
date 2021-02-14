@@ -12,14 +12,7 @@ class _HomePagePostState extends State<HomePagePost> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.only(
-          left: (MediaQuery.of(context).size.width >= 1080.0)
-              ? (MediaQuery.of(context).size.width) * 0.25
-              : (MediaQuery.of(context).size.width) * 0.04,
-          right: (MediaQuery.of(context).size.width >= 1080.0)
-              ? (MediaQuery.of(context).size.width) * 0.25
-              : (MediaQuery.of(context).size.width) * 0.04,
-        ),
+
         child: SingleChildScrollView(
             child: Column(
           children: [
@@ -42,7 +35,7 @@ class _HomePagePostState extends State<HomePagePost> {
                         ),
                         Container(
                             child: Image.network(
-                                "https://images.pexels.com/photos/2246476/pexels-photo-2246476.jpeg")),
+                                "https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg")),
                         Container(
                           padding: EdgeInsets.only(
                               left: 20.0, top: 10.0, right: 20.0),

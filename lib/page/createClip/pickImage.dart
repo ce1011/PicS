@@ -11,8 +11,22 @@ class _PickImagePageState extends State<PickImagePage> {
   File _image;
   final picker = ImagePicker();
 
-  Future getImage() async {
+  Future getImageFromGallery() async {
+
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future getImageFromCamera() async {
+
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
 
     setState(() {
       if (pickedFile != null) {
@@ -26,7 +40,7 @@ class _PickImagePageState extends State<PickImagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Pick Image")),
+      appBar: AppBar(title: Text("Pick Image"),actions: [IconButton(icon: Icon(Icons.note_add_outlined), onPressed: getImageFromGallery),IconButton(icon: Icon(Icons.add_a_photo), onPressed: getImageFromCamera)],),
       body: Column(
         children: [
           Center(
@@ -35,12 +49,8 @@ class _PickImagePageState extends State<PickImagePage> {
                 : Image.file(_image),
           )
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: getImage,
-        tooltip: 'Pick Image',
-        child: Icon(Icons.add_a_photo),
-      ),
+      )
     );
   }
 }
+

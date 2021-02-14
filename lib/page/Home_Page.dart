@@ -7,6 +7,7 @@ import 'home/Home_Page_CreatePost.dart';
 import 'createClip/pickImage.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
+import 'chat/Select_Chat_Page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -49,12 +50,31 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text("PicS",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-)),
+        title: Text("PicS",
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            )),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.chat),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SelectChatPage()),
+                );
+              })
+        ],
       ),
-      body: Center(child: widgetList.elementAt(selectedHomePage)),
+      body: Container(
+          padding: EdgeInsets.only(
+            left: (MediaQuery.of(context).size.width >= 1080.0)
+                ? (MediaQuery.of(context).size.width) * 0.25
+                : (MediaQuery.of(context).size.width) * 0.04,
+            right: (MediaQuery.of(context).size.width >= 1080.0)
+                ? (MediaQuery.of(context).size.width) * 0.25
+                : (MediaQuery.of(context).size.width) * 0.04,
+          ),
+          child: widgetList.elementAt(selectedHomePage)),
       bottomNavigationBar: BottomNavigationBar(
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(icon: Icon(Icons.post_add), label: "Post"),
@@ -67,12 +87,16 @@ class _HomePageState extends State<HomePage> {
           showUnselectedLabels: false,
           type: BottomNavigationBarType.fixed,
           elevation: 0),
-      floatingActionButton: FloatingActionButton(child: Icon(Icons.post_add), onPressed: (){
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PickImagePage()),
-        );
-      },),
+      floatingActionButton: (selectedHomePage == 0 && Provider.of<LoginStateNotifier>(context, listen: false).loginState ==
+          true) ? FloatingActionButton(
+        child: Icon(Icons.post_add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PickImagePage()),
+          );
+        },
+      ): null,
     );
   }
 }

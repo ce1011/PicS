@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
           builder: (context, widget) => ResponsiveWrapper.builder(
               BouncingScrollWrapper.builder(context, widget),
-              maxWidth: 3440,
+              maxWidth: 5120,
               minWidth: 450,
               defaultScale: true,
               breakpoints: [
@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
             buttonColor: Colors.greenAccent[400],
             primaryColor: Colors.greenAccent[400],
           ),
-          home: HomePage(),
+          home: LoginPage(),
           routes: {
             "/home": (context) => HomePage(),
             "/login": (context) => LoginPage(),

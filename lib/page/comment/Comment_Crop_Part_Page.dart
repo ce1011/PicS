@@ -17,7 +17,12 @@ class CommentCropPartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("Crop Comment")),
+        appBar: AppBar(title: Text("Crop Comment"), actions: [IconButton(icon: Icon(Icons.send), onPressed: (){
+          int count = 0;
+          Navigator.popUntil(context, (route) {
+            return count++ == 2;
+          });
+        })],),
         body: Container(
             padding: EdgeInsets.only(
               left: (MediaQuery.of(context).size.width >= 1080.0)
@@ -57,7 +62,6 @@ class CommentCropPartPage extends StatelessWidget {
                 )))
               ],
             )),
-    floatingActionButton: FloatingActionButton(child:Icon(Icons.send)),
     );
   }
 }
