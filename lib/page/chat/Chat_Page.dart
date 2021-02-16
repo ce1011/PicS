@@ -50,6 +50,7 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   )),
               Divider(
+                thickness: 3.0,
                 color: Colors.greenAccent[400],
               ),
               Expanded(

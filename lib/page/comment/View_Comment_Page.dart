@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as ImageProcess;
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 import '../../component/Comment_Crop_Photo.dart';
 import '../comment/Crop_Page.dart';
@@ -26,8 +27,14 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
 
   Future<void> getPhoto() async {
     //https://cors-anywhere.herokuapp.com/
-    var url =
-        'https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
+    var url;
+    if(kIsWeb){
+      url =
+          'https://ce1011.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
+    }else{
+      url =
+      'https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
+    }
 
     var response = await http.get(url);
 
@@ -85,13 +92,12 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
                               color: Colors.greenAccent[400],
                             ),
                             Container(
-                                child: AspectRatio(
-                                    aspectRatio: 1,
-                                    child: CommentCropPhoto(photoByte,
+                                child:
+                                    CommentCropPhoto(photoByte,
                                         StartX: 420,
                                         StartY: 107,
                                         EndX: 835,
-                                        EndY: 520))),
+                                        EndY: 520)),
                             Container(
                               padding: EdgeInsets.only(
                                   left: 20.0, top: 10.0, right: 20.0),
@@ -133,13 +139,12 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
                               color: Colors.greenAccent[400],
                             ),
                             Container(
-                                child: AspectRatio(
-                                    aspectRatio: 1,
+
                                     child: CommentCropPhoto(photoByte,
-                                        StartX: 172,
-                                        StartY: 307,
+                                        StartX: 0,
+                                        StartY: 0,
                                         EndX: 585,
-                                        EndY: 720))),
+                                        EndY: 720,)),
                             Container(
                               padding: EdgeInsets.only(
                                   left: 20.0, top: 10.0, right: 20.0),
