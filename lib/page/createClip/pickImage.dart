@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 
 class PickImagePage extends StatefulWidget {
   @override
@@ -8,16 +11,17 @@ class PickImagePage extends StatefulWidget {
 }
 
 class _PickImagePageState extends State<PickImagePage> {
-  File _image;
+  Uint8List _image;
   final picker = ImagePicker();
 
   Future getImageFromGallery() async {
-
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    FilePickerResult result = await FilePicker.platform
+        .pickFiles(type: FileType.image, withData: true);
 
     setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
+      if (result != null) {
+        PlatformFile file = result.files.first;
+        _image = file.bytes;
       } else {
         print('No image selected.');
       }
@@ -25,12 +29,12 @@ class _PickImagePageState extends State<PickImagePage> {
   }
 
   Future getImageFromCamera() async {
-
     final pickedFile = await picker.getImage(source: ImageSource.camera);
 
     setState(() {
       if (pickedFile != null) {
-        _image = File(pickedFile.path);
+        print(pickedFile.path);
+        _image = File(pickedFile.path).readAsBytesSync();
       } else {
         print('No image selected.');
       }
@@ -40,17 +44,24 @@ class _PickImagePageState extends State<PickImagePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Pick Image"),actions: [IconButton(icon: Icon(Icons.note_add_outlined), onPressed: getImageFromGallery),IconButton(icon: Icon(Icons.add_a_photo), onPressed: getImageFromCamera)],),
-      body: Column(
-        children: [
-          Center(
-            child: _image == null
-                ? Text('No image selected.')
-                : Image.file(_image),
-          )
-        ],
-      )
-    );
+        appBar: AppBar(
+          title: Text("Pick Image"),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.note_add_outlined),
+                onPressed: getImageFromGallery),
+            IconButton(
+                icon: Icon(Icons.add_a_photo), onPressed: getImageFromCamera)
+          ],
+        ),
+        body: Column(
+          children: [
+            Center(
+              child: _image == null
+                  ? Text('No image selected.')
+                  : Image.memory(_image),
+            )
+          ],
+        ));
   }
 }
-

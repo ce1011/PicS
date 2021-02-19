@@ -7,8 +7,6 @@ import 'page/register/Register_Page_Email.dart';
 import 'page/register/Register_Page_Password.dart';
 import 'page/register/Register_Page_Name.dart';
 import 'page/register/Register_Page_Processing.dart';
-import 'page/comment/View_Comment_Page.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 
 
 Future<void> main() async {
@@ -22,17 +20,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [ChangeNotifierProvider.value(value: LoginStateNotifier())],
       child: MaterialApp(
-          builder: (context, widget) => ResponsiveWrapper.builder(
-              BouncingScrollWrapper.builder(context, widget),
-              maxWidth: 5120,
-              minWidth: 450,
-              defaultScale: true,
-              breakpoints: [
-                ResponsiveBreakpoint.resize(480, name: MOBILE),
-                ResponsiveBreakpoint.autoScale(800, name: TABLET),
-                ResponsiveBreakpoint.resize(1000, name: DESKTOP),
-              ],
-              background: Container(color: Color(0xFFF5F5F5))),
           title: 'PicS',
           theme: ThemeData(
             brightness: Brightness.dark,
@@ -44,10 +31,7 @@ class MyApp extends StatelessWidget {
           routes: {
             "/home": (context) => HomePage(),
             "/login": (context) => LoginPage(),
-            "/register/email": (context) => RegisterPageEmail(),
-            "/register/password": (context) => RegisterPagePassword(),
-            "/register/name": (context) => RegisterPageName(),
-            "/register/processing": (context) => RegisterPageProcessing(),
+            "/register": (context) => RegisterPageEmail(),
           }),
     );
   }
