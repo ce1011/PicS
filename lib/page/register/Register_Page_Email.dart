@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
+import 'Register_Page_PhoneNo.dart';
+import 'package:provider/provider.dart';
+import '../../provider/RegisterInformationContainer.dart';
 
 class RegisterPageEmail extends StatelessWidget {
-  TextEditingController email, password, firstName, lastName;
+  final TextEditingController emailInputController =
+  new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +28,7 @@ class RegisterPageEmail extends StatelessWidget {
                 padding: EdgeInsets.only(
                     left: 20.0, top: 10.0, right: 20.0, bottom: 10.0),
                 child: TextField(
-                  controller: email,
+                  controller: emailInputController,
                   //inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"))],
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
@@ -39,7 +43,8 @@ class RegisterPageEmail extends StatelessWidget {
                   ),
                 )),
             Container(child: RaisedButton(child: Text("Next"), onPressed: (){
-              Navigator.pushNamed(context, "/register/password");
+              Provider.of<RegisterInformationContainer>(context, listen: false).setEmail(emailInputController.text);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),);
             },),)
           ],
           mainAxisAlignment: MainAxisAlignment.center,

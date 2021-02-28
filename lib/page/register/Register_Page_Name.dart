@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import 'package:pics/page/register/Register_Page_Password.dart';
+import 'package:provider/provider.dart';
+import '../../provider/RegisterInformationContainer.dart';
 
 class RegisterPageName extends StatelessWidget {
-  TextEditingController email, password, username;
+  final TextEditingController nameInputController =
+  new TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +31,7 @@ class RegisterPageName extends StatelessWidget {
                 padding: EdgeInsets.only(
                     left: 20.0, top: 10.0, right: 20.0, bottom: 10.0),
                 child: TextField(
-                  controller: username,
+                  controller: nameInputController,
                   //inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"))],
                   keyboardType: TextInputType.name,
                   decoration: InputDecoration(
@@ -45,8 +49,8 @@ class RegisterPageName extends StatelessWidget {
               child: RaisedButton(
                 child: Text("Next"),
                 onPressed: () {
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, "/register/processing", (route) => false);
+                  Provider.of<RegisterInformationContainer>(context, listen: false).setName(nameInputController.text);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPagePassword()),);
                 },
               ),
             )

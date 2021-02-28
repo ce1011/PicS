@@ -30,7 +30,7 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
     var url;
     if(kIsWeb){
       url =
-          'https://ce1011.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
+          'https://sehh3140_pics.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
     }else{
       url =
       'https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
@@ -85,7 +85,7 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
                               dense: true,
                               leading: CircleIcon(
                                   url: "https://i.imgur.com/BoN9kdC.png"),
-                              title: Text("Handsome"),
+                              title: Text("Wai Ho Chan"),
                               subtitle: Text("Comment at 31 Feb 2021 23:59"),
                             ),
                             Divider(
@@ -132,7 +132,7 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
                               dense: true,
                               leading: CircleIcon(
                                   url: "https://i.imgur.com/BoN9kdC.png"),
-                              title: Text("Handsome"),
+                              title: Text("Wai Ho Chan"),
                               subtitle: Text("Comment at 31 Feb 2021 23:59"),
                             ),
                             Divider(

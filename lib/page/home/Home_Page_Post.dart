@@ -26,7 +26,7 @@ class _HomePagePostState extends State<HomePagePost> {
                       dense: true,
                       leading:
                           CircleIcon(url: "https://i.imgur.com/BoN9kdC.png"),
-                      title: Text("DLLM"),
+                      title: Text("Ted Chan"),
                       subtitle: Text("Posted at 31 Feb 2021 23:59"),
                     ),
                     Divider(
@@ -75,7 +75,7 @@ class _HomePagePostState extends State<HomePagePost> {
                       leading: CircleIcon(
                           url:
                               "https://flutter.github.io/assets-for-api-docs/assets/widgets/owl-2.jpg"),
-                      title: Text("Silly"),
+                      title: Text("Chan wai ho"),
                       subtitle: Text("Posted at 25 Feb 2020 12:00"),
                     ),
                     Divider(

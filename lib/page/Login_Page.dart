@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import '../provider/LoginStateNotifier.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController accountInputController =
@@ -9,8 +10,20 @@ class LoginPage extends StatelessWidget {
   final TextEditingController passwordInputController =
       new TextEditingController();
 
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
+    auth.authStateChanges().listen((User user) {
+      if (user == null) {
+
+      } else {
+        Provider.of<LoginStateNotifier>(context, listen: false)
+            .login(user.email);
+        Navigator.pushReplacementNamed(context, "/home");
+      }
+    });
+
     return Scaffold(
         body: Builder(
             builder: (context) => Container(
@@ -90,17 +103,30 @@ class LoginPage extends StatelessWidget {
                           top: (MediaQuery.of(context).size.height >= 1080.0)
                               ? (MediaQuery.of(context).size.height) * 0.005
                               : 0,
-                          bottom: (MediaQuery.of(context).size.height >=
-                              1080.0)
+                          bottom: (MediaQuery.of(context).size.height >= 1080.0)
                               ? (MediaQuery.of(context).size.height) * 0.01
                               : 0,
                         ),
                         child: RaisedButton(
-                          onPressed: () {
-                            Provider.of<LoginStateNotifier>(context,
-                                    listen: false)
-                                .login(accountInputController.text);
-                            Navigator.pushReplacementNamed(context, "/home");
+                          onPressed: () async {
+                            try {
+                              UserCredential userCredential =
+                                  await auth.signInWithEmailAndPassword(
+                                      email: accountInputController.text,
+                                      password: passwordInputController.text);
+                            } on FirebaseAuthException catch (e) {
+                              if (e.code == 'user-not-found') {
+                                final snackBar = SnackBar(
+                                    content:
+                                        Text('No user found for that email.'));
+                                Scaffold.of(context).showSnackBar(snackBar);
+                              } else if (e.code == 'wrong-password') {
+                                final snackBar = SnackBar(
+                                    content: Text(
+                                        'Wrong password provided for that user.'));
+                                Scaffold.of(context).showSnackBar(snackBar);
+                              }
+                            }
                           },
                           child: Text("Login",
                               style: TextStyle(color: Colors.black)),
@@ -111,8 +137,7 @@ class LoginPage extends StatelessWidget {
                           top: (MediaQuery.of(context).size.height >= 1080.0)
                               ? (MediaQuery.of(context).size.height) * 0.005
                               : 0,
-                          bottom: (MediaQuery.of(context).size.height >=
-                              1080.0)
+                          bottom: (MediaQuery.of(context).size.height >= 1080.0)
                               ? (MediaQuery.of(context).size.height) * 0.01
                               : 0,
                         ),
@@ -132,7 +157,7 @@ class LoginPage extends StatelessWidget {
                           Text("Don't have an account?"),
                           TextButton(
                             onPressed: () {
-                              Navigator.pushNamed(context, "/register/email");
+                              Navigator.pushNamed(context, "/register");
                             },
                             child: Text("Sign Up",
                                 style: TextStyle(

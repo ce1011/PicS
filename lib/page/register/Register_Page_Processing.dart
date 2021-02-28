@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import '../../provider/RegisterInformationContainer.dart';
+import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPageProcessing extends StatefulWidget {
   @override
@@ -7,14 +10,39 @@ class RegisterPageProcessing extends StatefulWidget {
 }
 
 class _RegisterPageProcessingState extends State<RegisterPageProcessing> {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   void initState(){
     super.initState();
-    Future.delayed(Duration(seconds: 5),
-            () => Navigator.pushNamedAndRemoveUntil(context, "/home", (route) => false));
+    register();
+  }
+
+  register() async{
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: Provider.of<RegisterInformationContainer>(context, listen: false).getEmail(),
+          password: Provider.of<RegisterInformationContainer>(context, listen: false).getPassword()
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        final snackBar = SnackBar(
+            content:
+            Text('The password provided is too weak.'));
+        Scaffold.of(context).showSnackBar(snackBar);
+      } else if (e.code == 'email-already-in-use') {
+        final snackBar = SnackBar(
+            content:
+            Text('The account already exists for that email.'));
+        Scaffold.of(context).showSnackBar(snackBar);
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
+
   Widget build(BuildContext context) {
     return Scaffold(
         body: Column(

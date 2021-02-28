@@ -4,6 +4,7 @@ import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import '../../component/Circle_Icon.dart';
 import '../comment/View_Comment_Page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePageProfile extends StatefulWidget {
   @override
@@ -11,6 +12,8 @@ class HomePageProfile extends StatefulWidget {
 }
 
 class _HomePageProfileState extends State<HomePageProfile> {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -142,6 +145,7 @@ class _HomePageProfileState extends State<HomePageProfile> {
                 RaisedButton(
                   child: Text("Log Out"),
                   onPressed: () {
+                    auth.signOut();
                     Navigator.popAndPushNamed(context, "/login");
                   },
                 )
