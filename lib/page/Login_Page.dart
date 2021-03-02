@@ -20,7 +20,7 @@ class LoginPage extends StatelessWidget {
       } else {
         Provider.of<LoginStateNotifier>(context, listen: false)
             .login(user.email);
-        Navigator.pushReplacementNamed(context, "/home");
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     });
 

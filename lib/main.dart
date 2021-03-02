@@ -38,9 +38,8 @@ class MyApp extends StatelessWidget {
             child: MaterialApp(
                 title: 'PicS',
                 theme: ThemeData(
-                  brightness: Brightness.dark,
+                  brightness: Brightness.light,
                   accentColor: Colors.greenAccent[400],
-                  buttonColor: Colors.greenAccent[400],
                   primaryColor: Colors.greenAccent[400],
                 ),
                 home: LoginPage(),
