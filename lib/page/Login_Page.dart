@@ -16,7 +16,6 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     auth.authStateChanges().listen((User user) {
       if (user == null) {
-
       } else {
         Provider.of<LoginStateNotifier>(context, listen: false)
             .login(user.email);
