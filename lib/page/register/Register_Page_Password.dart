@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:pics/page/register/Register_Page_PhoneNo.dart';
 import '../../provider/RegisterInformationContainer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPagePassword extends StatelessWidget {
   final TextEditingController passwordInputController =
@@ -45,10 +47,15 @@ class RegisterPagePassword extends StatelessWidget {
             Container(
               child: RaisedButton(
                 child: Text("Next"),
-                onPressed: () {
+                onPressed: () async {
                   Provider.of<RegisterInformationContainer>(context, listen: false).setPassword(passwordInputController.text);
-                  Navigator.pushNamed(
-                      context, "/register/processing");
+
+                  UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                      email: Provider.of<RegisterInformationContainer>(context, listen: false).getEmail(),
+                      password: Provider.of<RegisterInformationContainer>(context, listen: false).getPassword()
+                  );
+
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),);
                 },
               ),
             )

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
-import 'Register_Page_PhoneNo.dart';
+import 'Register_Page_Name.dart';
 import 'package:provider/provider.dart';
 import '../../provider/RegisterInformationContainer.dart';
 
@@ -44,7 +44,7 @@ class RegisterPageEmail extends StatelessWidget {
                 )),
             Container(child: RaisedButton(child: Text("Next"), onPressed: (){
               Provider.of<RegisterInformationContainer>(context, listen: false).setEmail(emailInputController.text);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPageName()),);
             },),)
           ],
           mainAxisAlignment: MainAxisAlignment.center,

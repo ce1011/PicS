@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'register/Register_Page_PhoneNo.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController accountInputController =
@@ -15,10 +16,12 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     auth.authStateChanges().listen((User user) {
-      if (user == null) {
+      if (user.phoneNumber == null) {
+        print("No phone");
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()), (route) => false);
       } else {
         Provider.of<LoginStateNotifier>(context, listen: false)
-            .login(user.email);
+            .login(user.uid);
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     });

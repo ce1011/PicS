@@ -19,7 +19,7 @@ class _ChatPageState extends State<ChatPage> {
           title: Row(children: [
             CircleIcon(url: "https://i.imgur.com/BoN9kdC.png"),
             Container(padding: EdgeInsets.only(left: 15)),
-            Text("Dick")
+            Text("Handsome")
           ]),
           actions: [
             IconButton(

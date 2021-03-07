@@ -47,7 +47,8 @@ class RegisterPagePhoneNo extends StatelessWidget {
               child: RaisedButton(
                 child: Text("Next"),onPressed: (){
                 Provider.of<RegisterInformationContainer>(context, listen: false).setPhoneNo(phoneNoInputController.text);
-                Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPageName()),);
+                Navigator.pushNamed(
+                    context, "/register/processing");
               },
               ),
             )
