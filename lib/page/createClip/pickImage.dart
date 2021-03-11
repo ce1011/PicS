@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class PickImagePage extends StatefulWidget {
   @override
@@ -11,8 +14,13 @@ class PickImagePage extends StatefulWidget {
 }
 
 class _PickImagePageState extends State<PickImagePage> {
+  FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+  firebase_storage.FirebaseStorage storageInstance =
+      firebase_storage.FirebaseStorage.instance;
+
   Uint8List _image;
   final picker = ImagePicker();
+  List<String> groupList;
 
   Future getImageFromGallery() async {
     FilePickerResult result = await FilePicker.platform
@@ -40,6 +48,8 @@ class _PickImagePageState extends State<PickImagePage> {
       }
     });
   }
+
+  Future postClipToDatabase() async {}
 
   @override
   Widget build(BuildContext context) {

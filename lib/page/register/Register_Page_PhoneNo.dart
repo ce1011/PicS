@@ -33,8 +33,8 @@ class RegisterPagePhoneNo extends StatelessWidget {
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   prefixIcon:
-                  Icon(Icons.vpn_key_outlined, color: Color(0xFF2308423)),
-                  labelText: "Password",
+                  Icon(Icons.phone, color: Color(0xFF2308423)),
+                  labelText: "Phone Number",
                   enabledBorder: OutlineInputBorder(
                       borderSide: new BorderSide(color: Color(0xFF2308423))),
                   focusedBorder: OutlineInputBorder(

@@ -100,11 +100,14 @@ class _RegisterPageProcessingState extends State<RegisterPageProcessing> {
 
                         String smsCode = validationCodeController.text;
                         bool pass = true;
-                        if(kIsWeb){
+                        if(kIsWeb){ //Process out of flutter
                           print(smsCode);
                           UserCredential userCredential = await confirmationResult.confirm(smsCode);
 
+                          print(userCredential);
 
+                          await auth.currentUser
+                              .linkWithCredential(userCredential.credential);
                         }else{
                           try {
                             PhoneAuthCredential phoneAuthCredential =
@@ -120,6 +123,12 @@ class _RegisterPageProcessingState extends State<RegisterPageProcessing> {
                               final snackBar = SnackBar(
                                   content: Text(
                                       'Phone Number have been use in other account.'));
+                              Scaffold.of(context).showSnackBar(snackBar);
+                            }else{
+                              pass = false;
+                              final snackBar = SnackBar(
+                                  content: Text(
+                                      'Other error'));
                               Scaffold.of(context).showSnackBar(snackBar);
                             }
                           }

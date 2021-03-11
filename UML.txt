@@ -1,0 +1,373 @@
+@startuml
+set namespaceSeparator ::
+
+class "pics::component::Circle_Icon.dart::CircleIcon" {
+  +dynamic url
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::component::Circle_Icon.dart::CircleIcon"
+
+class "pics::component::Comment_Crop_Photo.dart::CommentCropPhoto" {
+  +int StartX
+  +int StartY
+  +int EndX
+  +int EndY
+  +Uint8List photoByte
+  +Widget build()
+}
+
+"pics::component::Comment_Crop_Photo.dart::CommentCropPhoto" o-- "dart::typed_data::Uint8List"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::component::Comment_Crop_Photo.dart::CommentCropPhoto"
+
+class "pics::firebase::Firebase_Post_Data_Agent.dart::FirebasePostDataAgent" {
+  -CollectionReference _fireStoreInstance
+  -FirebaseStorage _storageInstance
+  +dynamic getPostImageURL()
+}
+
+"pics::firebase::Firebase_Post_Data_Agent.dart::FirebasePostDataAgent" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference"
+"pics::firebase::Firebase_Post_Data_Agent.dart::FirebasePostDataAgent" o-- "firebase_storage::firebase_storage.dart::FirebaseStorage"
+
+class "pics::firebase::Firebase_User_Data_Agent.dart::FirebaseUserDataAgent" {
+  -CollectionReference _fireStoreInstance
+  -FirebaseStorage _storageInstance
+  +dynamic getUserIconURL()
+  +dynamic getUserName()
+  +dynamic getUserPersonalDescription()
+  +dynamic getUserCustomGroupList()
+}
+
+"pics::firebase::Firebase_User_Data_Agent.dart::FirebaseUserDataAgent" o-- "cloud_firestore::cloud_firestore.dart::CollectionReference"
+"pics::firebase::Firebase_User_Data_Agent.dart::FirebaseUserDataAgent" o-- "firebase_storage::firebase_storage.dart::FirebaseStorage"
+
+class "pics::main.dart::MyApp" {
+  -dynamic _firebaseInitialization
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::main.dart::MyApp"
+
+class "pics::page::chat::Chat_Page.dart::ChatPage" {
+  +dynamic uid
+  +_ChatPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::chat::Chat_Page.dart::ChatPage"
+
+class "pics::page::chat::Chat_Page.dart::_ChatPageState" {
+  +List<int> test
+  +FirebaseFirestore firestoreInstance
+  +FirebaseStorage storageInstance
+  +QueryDocumentSnapshot chatContentList
+  +void initState()
+  +dynamic getChatContent()
+  +dynamic sendTextMessage()
+  +dynamic sendPhotoMessage()
+  +dynamic sendVoiceMessage()
+  +dynamic sendFileMessage()
+  +void chatListPush()
+  +Widget build()
+}
+
+"pics::page::chat::Chat_Page.dart::_ChatPageState" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"pics::page::chat::Chat_Page.dart::_ChatPageState" o-- "firebase_storage::firebase_storage.dart::FirebaseStorage"
+"pics::page::chat::Chat_Page.dart::_ChatPageState" o-- "cloud_firestore::cloud_firestore.dart::QueryDocumentSnapshot"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::chat::Chat_Page.dart::_ChatPageState"
+
+class "pics::page::chat::Select_Chat_Page.dart::SelectChatPage" {
+  +_SelectChatPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::chat::Select_Chat_Page.dart::SelectChatPage"
+
+class "pics::page::chat::Select_Chat_Page.dart::_SelectChatPageState" {
+  +FirebaseFirestore firestoreInstance
+  +QuerySnapshot chatList
+  +void initState()
+  +dynamic getChatList()
+  +Widget build()
+}
+
+"pics::page::chat::Select_Chat_Page.dart::_SelectChatPageState" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"pics::page::chat::Select_Chat_Page.dart::_SelectChatPageState" o-- "cloud_firestore::cloud_firestore.dart::QuerySnapshot"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::chat::Select_Chat_Page.dart::_SelectChatPageState"
+
+class "pics::page::comment::Comment_Crop_Part_Page.dart::CommentCropPartPage" {
+  +Uint8List photoByte
+  +int StartX
+  +int StartY
+  +int EndX
+  +int EndY
+  +TextEditingController commentInputController
+  +Widget build()
+}
+
+"pics::page::comment::Comment_Crop_Part_Page.dart::CommentCropPartPage" o-- "dart::typed_data::Uint8List"
+"pics::page::comment::Comment_Crop_Part_Page.dart::CommentCropPartPage" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::page::comment::Comment_Crop_Part_Page.dart::CommentCropPartPage"
+
+class "pics::page::comment::Crop_Page.dart::CropPage" {
+  +Uint8List photoByte
+  +_CropPageState createState()
+}
+
+"pics::page::comment::Crop_Page.dart::CropPage" o-- "dart::typed_data::Uint8List"
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::comment::Crop_Page.dart::CropPage"
+
+class "pics::page::comment::Crop_Page.dart::_CropPageState" {
+  +GlobalKey<CropState> cropKey
+  +int StartX
+  +int StartY
+  +int EndX
+  +int EndY
+  +Widget build()
+}
+
+"pics::page::comment::Crop_Page.dart::_CropPageState" o-- "flutter::src::widgets::framework.dart::GlobalKey<CropState>"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::comment::Crop_Page.dart::_CropPageState"
+
+class "pics::page::comment::View_Comment_Page.dart::ViewCommentPage" {
+  +dynamic postID
+  +_ViewCommentPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::comment::View_Comment_Page.dart::ViewCommentPage"
+
+class "pics::page::comment::View_Comment_Page.dart::_ViewCommentPageState" {
+  +Uint8List photoByte
+  +Image photo
+  +FirebaseFirestore firestoreInstance
+  +FirebaseUserDataAgent firebaseUserDataAgent
+  +FirebasePostDataAgent firebasePostDataAgent
+  +QuerySnapshot commentList
+  +void initState()
+  +dynamic getPhoto()
+  +dynamic getComment()
+  +Widget build()
+}
+
+"pics::page::comment::View_Comment_Page.dart::_ViewCommentPageState" o-- "dart::typed_data::Uint8List"
+"pics::page::comment::View_Comment_Page.dart::_ViewCommentPageState" o-- "image::src::image.dart::Image"
+"pics::page::comment::View_Comment_Page.dart::_ViewCommentPageState" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"pics::page::comment::View_Comment_Page.dart::_ViewCommentPageState" o-- "pics::firebase::Firebase_User_Data_Agent.dart::FirebaseUserDataAgent"
+"pics::page::comment::View_Comment_Page.dart::_ViewCommentPageState" o-- "pics::firebase::Firebase_Post_Data_Agent.dart::FirebasePostDataAgent"
+"pics::page::comment::View_Comment_Page.dart::_ViewCommentPageState" o-- "cloud_firestore::cloud_firestore.dart::QuerySnapshot"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::comment::View_Comment_Page.dart::_ViewCommentPageState"
+
+class "pics::page::createClip::pickImage.dart::PickImagePage" {
+  +_PickImagePageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::createClip::pickImage.dart::PickImagePage"
+
+class "pics::page::createClip::pickImage.dart::_PickImagePageState" {
+  +FirebaseFirestore firestoreInstance
+  +FirebaseStorage storageInstance
+  -Uint8List _image
+  +ImagePicker picker
+  +List groupList
+  +dynamic getImageFromGallery()
+  +dynamic getImageFromCamera()
+  +dynamic postClipToDatabase()
+  +Widget build()
+}
+
+"pics::page::createClip::pickImage.dart::_PickImagePageState" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"pics::page::createClip::pickImage.dart::_PickImagePageState" o-- "firebase_storage::firebase_storage.dart::FirebaseStorage"
+"pics::page::createClip::pickImage.dart::_PickImagePageState" o-- "dart::typed_data::Uint8List"
+"pics::page::createClip::pickImage.dart::_PickImagePageState" o-- "image_picker::image_picker.dart::ImagePicker"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::createClip::pickImage.dart::_PickImagePageState"
+
+class "pics::page::home::Home_Page_Post.dart::HomePagePost" {
+  +_HomePagePostState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::home::Home_Page_Post.dart::HomePagePost"
+
+class "pics::page::home::Home_Page_Post.dart::_HomePagePostState" {
+  +FirebaseFirestore firestoreInstance
+  +FirebaseUserDataAgent firebaseUserDataAgent
+  +FirebasePostDataAgent firebasePostDataAgent
+  +QuerySnapshot postList
+  +void initState()
+  +dynamic getPostImageURL()
+  +dynamic getPost()
+  +Widget build()
+}
+
+"pics::page::home::Home_Page_Post.dart::_HomePagePostState" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"pics::page::home::Home_Page_Post.dart::_HomePagePostState" o-- "pics::firebase::Firebase_User_Data_Agent.dart::FirebaseUserDataAgent"
+"pics::page::home::Home_Page_Post.dart::_HomePagePostState" o-- "pics::firebase::Firebase_Post_Data_Agent.dart::FirebasePostDataAgent"
+"pics::page::home::Home_Page_Post.dart::_HomePagePostState" o-- "cloud_firestore::cloud_firestore.dart::QuerySnapshot"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::home::Home_Page_Post.dart::_HomePagePostState"
+
+class "pics::page::home::Home_Page_Profile.dart::HomePageProfile" {
+  +dynamic UID
+  +_HomePageProfileState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::home::Home_Page_Profile.dart::HomePageProfile"
+
+class "pics::page::home::Home_Page_Profile.dart::_HomePageProfileState" {
+  +FirebaseAuth auth
+  +FirebaseFirestore firestoreInstance
+  +FirebaseUserDataAgent firebaseUserDataAgent
+  +FirebasePostDataAgent firebasePostDataAgent
+  +QuerySnapshot userPostList
+  +dynamic getPost()
+  +void initState()
+  +Widget build()
+}
+
+"pics::page::home::Home_Page_Profile.dart::_HomePageProfileState" o-- "firebase_auth::firebase_auth.dart::FirebaseAuth"
+"pics::page::home::Home_Page_Profile.dart::_HomePageProfileState" o-- "cloud_firestore::cloud_firestore.dart::FirebaseFirestore"
+"pics::page::home::Home_Page_Profile.dart::_HomePageProfileState" o-- "pics::firebase::Firebase_User_Data_Agent.dart::FirebaseUserDataAgent"
+"pics::page::home::Home_Page_Profile.dart::_HomePageProfileState" o-- "pics::firebase::Firebase_Post_Data_Agent.dart::FirebasePostDataAgent"
+"pics::page::home::Home_Page_Profile.dart::_HomePageProfileState" o-- "cloud_firestore::cloud_firestore.dart::QuerySnapshot"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::home::Home_Page_Profile.dart::_HomePageProfileState"
+
+class "pics::page::Home_Page.dart::HomePage" {
+  +_HomePageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::Home_Page.dart::HomePage"
+
+class "pics::page::Home_Page.dart::_HomePageState" {
+  +int selectedHomePage
+  +List<Widget> widgetList
+  +void onTap()
+  +void initState()
+  +Widget build()
+}
+
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::Home_Page.dart::_HomePageState"
+
+class "pics::page::Login_Page.dart::LoginPage" {
+  +TextEditingController accountInputController
+  +TextEditingController passwordInputController
+  +FirebaseAuth auth
+  +Widget build()
+}
+
+"pics::page::Login_Page.dart::LoginPage" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"pics::page::Login_Page.dart::LoginPage" o-- "firebase_auth::firebase_auth.dart::FirebaseAuth"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::page::Login_Page.dart::LoginPage"
+
+class "pics::page::register::Register_Page_Email.dart::RegisterPageEmail" {
+  +TextEditingController emailInputController
+  +Widget build()
+}
+
+"pics::page::register::Register_Page_Email.dart::RegisterPageEmail" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::page::register::Register_Page_Email.dart::RegisterPageEmail"
+
+class "pics::page::register::Register_Page_Name.dart::RegisterPageName" {
+  +TextEditingController nameInputController
+  +Widget build()
+}
+
+"pics::page::register::Register_Page_Name.dart::RegisterPageName" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::page::register::Register_Page_Name.dart::RegisterPageName"
+
+class "pics::page::register::Register_Page_Password.dart::RegisterPagePassword" {
+  +TextEditingController passwordInputController
+  +Widget build()
+}
+
+"pics::page::register::Register_Page_Password.dart::RegisterPagePassword" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::page::register::Register_Page_Password.dart::RegisterPagePassword"
+
+class "pics::page::register::Register_Page_PhoneNo.dart::RegisterPagePhoneNo" {
+  +TextEditingController phoneNoInputController
+  +Widget build()
+}
+
+"pics::page::register::Register_Page_PhoneNo.dart::RegisterPagePhoneNo" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::StatelessWidget" <|-- "pics::page::register::Register_Page_PhoneNo.dart::RegisterPagePhoneNo"
+
+class "pics::page::register::Register_Page_Processing.dart::RegisterPageProcessing" {
+  +_RegisterPageProcessingState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::register::Register_Page_Processing.dart::RegisterPageProcessing"
+
+class "pics::page::register::Register_Page_Processing.dart::_RegisterPageProcessingState" {
+  +FirebaseAuth auth
+  +dynamic verificationId
+  +ConfirmationResult confirmationResult
+  +TextEditingController validationCodeController
+  +void initState()
+  +dynamic register()
+  +Widget build()
+}
+
+"pics::page::register::Register_Page_Processing.dart::_RegisterPageProcessingState" o-- "firebase_auth::firebase_auth.dart::FirebaseAuth"
+"pics::page::register::Register_Page_Processing.dart::_RegisterPageProcessingState" o-- "firebase_auth::firebase_auth.dart::ConfirmationResult"
+"pics::page::register::Register_Page_Processing.dart::_RegisterPageProcessingState" o-- "flutter::src::widgets::editable_text.dart::TextEditingController"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::register::Register_Page_Processing.dart::_RegisterPageProcessingState"
+
+class "pics::page::setting::Setting_Group_List_Edit_Page.dart::SettingGroupListEditPage" {
+  +_SettingGroupListEditPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::setting::Setting_Group_List_Edit_Page.dart::SettingGroupListEditPage"
+
+class "pics::page::setting::Setting_Group_List_Edit_Page.dart::_SettingGroupListEditPageState" {
+  +DocumentReference firestoreInstance
+  +dynamic updateGroup()
+  +void initState()
+  +Widget build()
+}
+
+"pics::page::setting::Setting_Group_List_Edit_Page.dart::_SettingGroupListEditPageState" o-- "cloud_firestore::cloud_firestore.dart::DocumentReference"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::setting::Setting_Group_List_Edit_Page.dart::_SettingGroupListEditPageState"
+
+class "pics::page::setting::Setting_Group_List_Page.dart::SettingGroupListPage" {
+  +_SettingGroupListPageState createState()
+}
+
+"flutter::src::widgets::framework.dart::StatefulWidget" <|-- "pics::page::setting::Setting_Group_List_Page.dart::SettingGroupListPage"
+
+class "pics::page::setting::Setting_Group_List_Page.dart::_SettingGroupListPageState" {
+  +FirebaseUserDataAgent firebaseUserDataAgent
+  +QuerySnapshot groupList
+  +void initState()
+  +Widget build()
+}
+
+"pics::page::setting::Setting_Group_List_Page.dart::_SettingGroupListPageState" o-- "pics::firebase::Firebase_User_Data_Agent.dart::FirebaseUserDataAgent"
+"pics::page::setting::Setting_Group_List_Page.dart::_SettingGroupListPageState" o-- "cloud_firestore::cloud_firestore.dart::QuerySnapshot"
+"flutter::src::widgets::framework.dart::State<T>" <|-- "pics::page::setting::Setting_Group_List_Page.dart::_SettingGroupListPageState"
+
+class "pics::provider::LoginStateNotifier.dart::LoginStateNotifier" {
+  -bool _login
+  +int UID
+  +String name
+  +String account
+  +bool loginState
+  +dynamic login()
+  +dynamic logout()
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "pics::provider::LoginStateNotifier.dart::LoginStateNotifier"
+
+class "pics::provider::RegisterInformationContainer.dart::RegisterInformationContainer" {
+  +String email
+  +String name
+  +String password
+  +String phoneno
+  +dynamic setName()
+  +dynamic setEmail()
+  +dynamic setPassword()
+  +dynamic setPhoneNo()
+  +String getName()
+  +String getEmail()
+  +String getPassword()
+  +String getPhoneNo()
+}
+
+"flutter::src::foundation::change_notifier.dart::ChangeNotifier" <|-- "pics::provider::RegisterInformationContainer.dart::RegisterInformationContainer"
+
+
+@enduml

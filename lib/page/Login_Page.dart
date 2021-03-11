@@ -18,10 +18,12 @@ class LoginPage extends StatelessWidget {
     auth.authStateChanges().listen((User user) {
       if (user.phoneNumber == null) {
         print("No phone");
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()), (route) => false);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),
+            (route) => false);
       } else {
-        Provider.of<LoginStateNotifier>(context, listen: false)
-            .login(user.uid);
+        Provider.of<LoginStateNotifier>(context, listen: false).login(user.uid);
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     });

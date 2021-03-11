@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pics/page/home/Home_Page_CreatePost.dart';
 import 'home/Home_Page_Post.dart';
 import 'home/Home_Page_Profile.dart';
-import 'home/Home_Page_Search.dart';
-import 'home/Home_Page_CreatePost.dart';
 import 'createClip/pickImage.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
@@ -73,14 +70,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: Container(
-          padding: EdgeInsets.only(
-            left: (MediaQuery.of(context).size.width >= 1080.0)
-                ? (MediaQuery.of(context).size.width) * 0.25
-                : (MediaQuery.of(context).size.width) * 0.04,
-            right: (MediaQuery.of(context).size.width >= 1080.0)
-                ? (MediaQuery.of(context).size.width) * 0.25
-                : (MediaQuery.of(context).size.width) * 0.04,
-          ),
           child: widgetList.elementAt(selectedHomePage)),
       bottomNavigationBar: BottomNavigationBar(
           items: <BottomNavigationBarItem>[
@@ -97,7 +86,7 @@ class _HomePageState extends State<HomePage> {
           (Provider.of<LoginStateNotifier>(context, listen: false).loginState ==
                   true)
               ? FloatingActionButton(
-                  child: Icon(Icons.post_add),
+                  child: Icon(Icons.post_add, color: Colors.grey[900],),
                   onPressed: () {
                     Navigator.push(
                       context,

@@ -3,14 +3,58 @@ import '../../component/Circle_Icon.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
+import 'dart:typed_data';
 
 class ChatPage extends StatefulWidget {
+  String uid;
+
+  ChatPage({Key key, @required this.uid}) : super(key: key);
+
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
   List<int> test = [1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1];
+  FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+  firebase_storage.FirebaseStorage storageInstance =
+      firebase_storage.FirebaseStorage.instance;
+
+  QueryDocumentSnapshot chatContentList;
+
+  @override
+  void initState() {
+    super.initState();
+
+    getChatContent();
+  }
+
+  Future<QuerySnapshot> getChatContent() async {
+    CollectionReference post = firestoreInstance.collection("post");
+    post
+        .where('__name__', isGreaterThanOrEqualTo: "1")
+        .get()
+        .then((data) => print(data.docs[0].data().toString()));
+
+    CollectionReference comment =
+        firestoreInstance.collection("post/1/comment");
+    return comment.get();
+  }
+
+  Future<void> sendTextMessage(String text) {}
+
+  Future<void> sendPhotoMessage(Uint8List photo) {}
+
+  Future<void> sendVoiceMessage(String voicePath) {}
+
+  Future<void> sendFileMessage(Uint8List file) {}
+
+  void chatListPush(int type,
+      {String text, Uint8List photo, String voicePath, Uint8List file}) {}
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +63,7 @@ class _ChatPageState extends State<ChatPage> {
           title: Row(children: [
             CircleIcon(url: "https://i.imgur.com/BoN9kdC.png"),
             Container(padding: EdgeInsets.only(left: 15)),
-            Text("Handsome")
+            Text(widget.uid)
           ]),
           actions: [
             IconButton(

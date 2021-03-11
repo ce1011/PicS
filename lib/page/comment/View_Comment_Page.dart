@@ -9,7 +9,16 @@ import '../../component/Comment_Crop_Photo.dart';
 import '../comment/Crop_Page.dart';
 import '../../component/Circle_Icon.dart';
 
+import '../../firebase/Firebase_User_Data_Agent.dart';
+import '../../firebase/Firebase_Post_Data_Agent.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ViewCommentPage extends StatefulWidget {
+  String postID;
+
+  ViewCommentPage({Key key, @required this.postID}) : super(key: key);
+
   @override
   _ViewCommentPageState createState() => _ViewCommentPageState();
 }
@@ -17,6 +26,12 @@ class ViewCommentPage extends StatefulWidget {
 class _ViewCommentPageState extends State<ViewCommentPage> {
   Uint8List photoByte;
   ImageProcess.Image photo;
+  FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
+  FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
+  FirebasePostDataAgent firebasePostDataAgent = FirebasePostDataAgent();
+
+  QuerySnapshot commentList;
 
   @override
   void initState() {
@@ -43,6 +58,17 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
     this.photo = ImageProcess.decodeJpg(photoByte);
   }
 
+  Future<QuerySnapshot> getComment(String postID) async {
+    CollectionReference post = firestoreInstance.collection("post");
+    post
+        .where('__name__', isGreaterThanOrEqualTo: "1")
+        .get()
+        .then((data) => print(data.docs[0].data().toString()));
+
+    CollectionReference comment = firestoreInstance.collection("post/1/comment");
+    return comment.get();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,14 +83,6 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
     ],),
       body: SingleChildScrollView(
           child: Container(
-              padding: EdgeInsets.only(
-                left: (MediaQuery.of(context).size.width >= 1080.0)
-                    ? (MediaQuery.of(context).size.width) * 0.25
-                    : (MediaQuery.of(context).size.width) * 0.04,
-                right: (MediaQuery.of(context).size.width >= 1080.0)
-                    ? (MediaQuery.of(context).size.width) * 0.25
-                    : (MediaQuery.of(context).size.width) * 0.04,
-              ),
               child: FutureBuilder<void>(
         future: getPhoto(),
         builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -75,94 +93,86 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
               return Column(children: [
                 Container(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(14.0))),
-                        child: Column(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          dense: true,
+                          leading: CircleIcon(
+                              url: "https://i.imgur.com/BoN9kdC.png"),
+                          title: Text("Wai Ho Chan"),
+                          subtitle: Text("Comment at 31 Feb 2021 23:59"),
+                        ),
+                        Divider(
+                          color: Colors.greenAccent[400],
+                        ),
+                        Container(
+                            child:
+                                CommentCropPhoto(photoByte,
+                                    StartX: 420,
+                                    StartY: 107,
+                                    EndX: 835,
+                                    EndY: 520)),
+                        Container(
+                          padding: EdgeInsets.only(
+                              left: 20.0, top: 10.0, right: 20.0),
+                          child: Text(
+                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+                        ),
+                        Divider(
+                          color: Colors.greenAccent[400],
+                        ),
+                        Container(
+                            child: Row(
                           children: [
-                            ListTile(
-                              dense: true,
-                              leading: CircleIcon(
-                                  url: "https://i.imgur.com/BoN9kdC.png"),
-                              title: Text("Wai Ho Chan"),
-                              subtitle: Text("Comment at 31 Feb 2021 23:59"),
-                            ),
-                            Divider(
-                              color: Colors.greenAccent[400],
-                            ),
-                            Container(
-                                child:
-                                    CommentCropPhoto(photoByte,
-                                        StartX: 420,
-                                        StartY: 107,
-                                        EndX: 835,
-                                        EndY: 520)),
-                            Container(
-                              padding: EdgeInsets.only(
-                                  left: 20.0, top: 10.0, right: 20.0),
-                              child: Text(
-                                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
-                            ),
-                            Divider(
-                              color: Colors.greenAccent[400],
-                            ),
-                            Container(
-                                child: Row(
-                              children: [
-                                IconButton(icon: Icon(Icons.favorite), onPressed: (){
+                            IconButton(icon: Icon(Icons.favorite), onPressed: (){
 
-                                },),
-                                IconButton(icon: Icon(Icons.forward),onPressed: (){
+                            },),
+                            IconButton(icon: Icon(Icons.forward),onPressed: (){
 
-                                }),
-                              ],
-                            ))
+                            }),
                           ],
-                        ))),
+                        ))
+                      ],
+                    )),
                 Container(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: Card(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(14.0))),
-                        child: Column(
-                          children: [
-                            ListTile(
-                              dense: true,
-                              leading: CircleIcon(
-                                  url: "https://i.imgur.com/BoN9kdC.png"),
-                              title: Text("Wai Ho Chan"),
-                              subtitle: Text("Comment at 31 Feb 2021 23:59"),
-                            ),
-                            Divider(
-                              color: Colors.greenAccent[400],
-                            ),
-                            Container(
+                    child: Column(
+                      children: [
+                        ListTile(
+                          dense: true,
+                          leading: CircleIcon(
+                              url: "https://i.imgur.com/BoN9kdC.png"),
+                          title: Text("Wai Ho Chan"),
+                          subtitle: Text("Comment at 31 Feb 2021 23:59"),
+                        ),
+                        Divider(
+                          color: Colors.greenAccent[400],
+                        ),
+                        Container(
 
-                                    child: CommentCropPhoto(photoByte,
-                                        StartX: 0,
-                                        StartY: 0,
-                                        EndX: 585,
-                                        EndY: 720,)),
-                            Container(
-                              padding: EdgeInsets.only(
-                                  left: 20.0, top: 10.0, right: 20.0),
-                              child: Text(
-                                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
-                            ),
-                            Divider(
-                              color: Colors.greenAccent[400],
-                            ),
-                            Container(
-                                child: Row(
-                                  children: [
-                                    IconButton(icon: Icon(Icons.favorite)),
-                                    IconButton(icon: Icon(Icons.forward)),
-                                  ],
-                                ))
-                          ],
-                        )))
+                                child: CommentCropPhoto(photoByte,
+                                    StartX: 0,
+                                    StartY: 0,
+                                    EndX: 585,
+                                    EndY: 720,)),
+                        Container(
+                          padding: EdgeInsets.only(
+                              left: 20.0, top: 10.0, right: 20.0),
+                          child: Text(
+                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+                        ),
+                        Divider(
+                          color: Colors.greenAccent[400],
+                        ),
+                        Container(
+                            child: Row(
+                              children: [
+                                IconButton(icon: Icon(Icons.favorite)),
+                                IconButton(icon: Icon(Icons.forward)),
+                              ],
+                            ))
+                      ],
+                    ))
               ]);
             }
           } else {

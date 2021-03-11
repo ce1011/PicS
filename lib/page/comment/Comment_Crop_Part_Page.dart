@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as ImageProcess;
 import '../../component/Comment_Crop_Photo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CommentCropPartPage extends StatelessWidget {
   final Uint8List photoByte;

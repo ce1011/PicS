@@ -16,13 +16,13 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  final Future<FirebaseApp> _firebaseInitialization = Firebase.initializeApp();
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       // Initialize FlutterFire:
-      future: _initialization,
+      future: _firebaseInitialization,
       builder: (context, snapshot) {
         // Check for errors
         if (snapshot.hasError) {
@@ -33,15 +33,28 @@ class MyApp extends StatelessWidget {
           return MultiProvider(
             providers: [
               ChangeNotifierProvider.value(value: LoginStateNotifier()),
-              ChangeNotifierProvider.value(value: RegisterInformationContainer()),
+              ChangeNotifierProvider.value(
+                  value: RegisterInformationContainer()),
             ],
             child: MaterialApp(
                 title: 'PicS',
                 theme: ThemeData(
-                  brightness: Brightness.light,
-                  accentColor: Colors.greenAccent[400],
-                  primaryColor: Colors.greenAccent[400],
-                ),
+                    brightness: Brightness.dark,
+                    accentColor: Colors.greenAccent[400],
+                    //primaryColor: Colors.greenAccent[400],
+                    scaffoldBackgroundColor: Colors.black,
+                    colorScheme: ColorScheme.dark(),
+                    dividerColor: Colors.greenAccent[400],
+                    //cardColor: Colors.black,
+                    bottomAppBarColor: Colors.black,
+                    buttonColor: Colors.greenAccent[400],
+                    floatingActionButtonTheme: FloatingActionButtonThemeData(
+
+                        backgroundColor: Colors.greenAccent[400]),
+                    appBarTheme: AppBarTheme(backgroundColor: Colors.black),
+                    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                      backgroundColor: Colors.black,
+                    )),
                 home: LoginPage(),
                 routes: {
                   "/home": (context) => HomePage(),
