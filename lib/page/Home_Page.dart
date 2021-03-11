@@ -70,6 +70,14 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: Container(
+          padding: EdgeInsets.only(
+            left: (MediaQuery.of(context).size.width >= 1080.0)
+                ? (MediaQuery.of(context).size.width) * 0.25
+                : 0,
+            right: (MediaQuery.of(context).size.width >= 1080.0)
+                ? (MediaQuery.of(context).size.width) * 0.25
+                : 0,
+          ),
           child: widgetList.elementAt(selectedHomePage)),
       bottomNavigationBar: BottomNavigationBar(
           items: <BottomNavigationBarItem>[
