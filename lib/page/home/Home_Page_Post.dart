@@ -71,7 +71,7 @@ class _HomePagePostState extends State<HomePagePost> {
                 ),
                 Container(
                     child: Image.network(
-                        "https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg")),
+                        "https://sehh3140_pics.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg")),
                 Container(
                   padding:
                       EdgeInsets.only(left: 20.0, top: 10.0, right: 20.0),
@@ -114,7 +114,7 @@ class _HomePagePostState extends State<HomePagePost> {
                 ),
                 Container(
                     child: Image.network(
-                        "https://cdn.wallpaperhub.app/cloudcache/1/b/5/8/e/f/1b58ef6e3d36a42e01992accf5c52d6eea244353.jpg")),
+                        "https://sehh3140_pics.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg")),
                 Container(
                   padding:
                       EdgeInsets.only(left: 20.0, top: 10.0, right: 20.0),

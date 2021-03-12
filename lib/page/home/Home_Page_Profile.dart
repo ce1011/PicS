@@ -95,7 +95,7 @@ class _HomePageProfileState extends State<HomePageProfile> {
                     ),
                     Container(
                         child: Image.network(
-                            "https://res.allmacwallpaper.com/pic/Thumbnails/3645_728.jpg")),
+                            "https://sehh3140_pics.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg")),
                     Container(
                       padding: EdgeInsets.only(
                           left: 20.0, top: 10.0, right: 20.0),
