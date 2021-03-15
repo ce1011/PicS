@@ -5,9 +5,8 @@ import 'package:image/image.dart' as ImageProcess;
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
-import '../../component/Comment_Crop_Photo.dart';
+import '../../component/Comment_View.dart';
 import '../comment/Crop_Page.dart';
-import '../../component/Circle_Icon.dart';
 
 import '../../firebase/Firebase_User_Data_Agent.dart';
 import '../../firebase/Firebase_Post_Data_Agent.dart';
@@ -36,19 +35,19 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
   @override
   void initState() {
     super.initState();
-
+    print(widget.postID);
     getPhoto();
   }
 
   Future<void> getPhoto() async {
     //https://cors-anywhere.herokuapp.com/
     var url;
-    if(kIsWeb){
+    if (kIsWeb) {
       url =
           'https://sehh3140_pics.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
-    }else{
+    } else {
       url =
-      'https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
+          'https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg';
     }
 
     var response = await http.get(url);
@@ -65,22 +64,30 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
         .get()
         .then((data) => print(data.docs[0].data().toString()));
 
-    CollectionReference comment = firestoreInstance.collection("post/1/comment");
+    CollectionReference comment =
+        firestoreInstance.collection("post/1/comment");
     return comment.get();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Comment"), actions: [IconButton(icon: Icon(Icons.add_comment), onPressed: (){
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => CropPage(
-              photoByte: photoByte,
-            )),
-      );})
-    ],),
+      appBar: AppBar(
+        title: Text("Comment"),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.add_comment),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => CropPage(
+                            photoByte: photoByte,
+                          )),
+                );
+              })
+        ],
+      ),
       body: SingleChildScrollView(
           child: Container(
               child: FutureBuilder<void>(
@@ -93,86 +100,27 @@ class _ViewCommentPageState extends State<ViewCommentPage> {
               return Column(children: [
                 Container(
                     padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          dense: true,
-                          leading: CircleIcon(
-                              url: "https://i.imgur.com/BoN9kdC.png"),
-                          title: Text("Wai Ho Chan"),
-                          subtitle: Text("Comment at 31 Feb 2021 23:59"),
-                        ),
-                        Divider(
-                          color: Colors.greenAccent[400],
-                        ),
-                        Container(
-                            child:
-                                CommentCropPhoto(photoByte,
-                                    StartX: 420,
-                                    StartY: 107,
-                                    EndX: 835,
-                                    EndY: 520)),
-                        Container(
-                          padding: EdgeInsets.only(
-                              left: 20.0, top: 10.0, right: 20.0),
-                          child: Text(
-                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
-                        ),
-                        Divider(
-                          color: Colors.greenAccent[400],
-                        ),
-                        Container(
-                            child: Row(
-                          children: [
-                            IconButton(icon: Icon(Icons.favorite), onPressed: (){
-
-                            },),
-                            IconButton(icon: Icon(Icons.forward),onPressed: (){
-
-                            }),
-                          ],
-                        ))
-                      ],
-                    )),
-                Container(
-                    padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          dense: true,
-                          leading: CircleIcon(
-                              url: "https://i.imgur.com/BoN9kdC.png"),
-                          title: Text("Wai Ho Chan"),
-                          subtitle: Text("Comment at 31 Feb 2021 23:59"),
-                        ),
-                        Divider(
-                          color: Colors.greenAccent[400],
-                        ),
-                        Container(
-
-                                child: CommentCropPhoto(photoByte,
-                                    StartX: 0,
-                                    StartY: 0,
-                                    EndX: 585,
-                                    EndY: 720,)),
-                        Container(
-                          padding: EdgeInsets.only(
-                              left: 20.0, top: 10.0, right: 20.0),
-                          child: Text(
-                              "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
-                        ),
-                        Divider(
-                          color: Colors.greenAccent[400],
-                        ),
-                        Container(
-                            child: Row(
-                              children: [
-                                IconButton(icon: Icon(Icons.favorite)),
-                                IconButton(icon: Icon(Icons.forward)),
-                              ],
-                            ))
-                      ],
-                    ))
+                    child: CommentView(
+                        username: "Wai Ho Chan",
+                        iconURL: "https://i.imgur.com/BoN9kdC.png",
+                        commentDate: "Comment at 31 Feb 2021 23:59",
+                        photoByte: photoByte,
+                        StartX: 428,
+                        StartY: 107,
+                        EndX: 835,
+                        EndY: 520,
+                        description: "Test")),
+                CommentView(
+                    username: "Wai Ho Chan",
+                    iconURL: "https://i.imgur.com/BoN9kdC.png",
+                    commentDate: "Comment at 31 Feb 2021 23:59",
+                    photoByte: photoByte,
+                    StartX: 0,
+                    StartY: 0,
+                    EndX: 585,
+                    EndY: 720,
+                    description:
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
               ]);
             }
           } else {

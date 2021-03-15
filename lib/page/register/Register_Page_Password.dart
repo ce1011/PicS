@@ -55,7 +55,7 @@ class RegisterPagePassword extends StatelessWidget {
                       password: Provider.of<RegisterInformationContainer>(context, listen: false).getPassword()
                   );
 
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),);
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),);
                 },
               ),
             )

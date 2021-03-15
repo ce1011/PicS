@@ -2,9 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
@@ -36,19 +34,6 @@ class _PickImagePageState extends State<PickImagePage> {
     });
   }
 
-  Future getImageFromCamera() async {
-    final pickedFile = await picker.getImage(source: ImageSource.camera);
-
-    setState(() {
-      if (pickedFile != null) {
-        print(pickedFile.path);
-        _image = File(pickedFile.path).readAsBytesSync();
-      } else {
-        print('No image selected.');
-      }
-    });
-  }
-
   Future postClipToDatabase() async {}
 
   @override
@@ -60,8 +45,6 @@ class _PickImagePageState extends State<PickImagePage> {
             IconButton(
                 icon: Icon(Icons.note_add_outlined),
                 onPressed: getImageFromGallery),
-            IconButton(
-                icon: Icon(Icons.add_a_photo), onPressed: getImageFromCamera)
           ],
         ),
         body: Column(

@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 import 'provider/LoginStateNotifier.dart';
 import 'provider/RegisterInformationContainer.dart';
+import 'provider/BrightnessNotifier.dart';
 import 'package:provider/provider.dart';
-import 'page/Login_Page.dart';
-import 'page/Home_Page.dart';
-import 'page/register/Register_Page_Email.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'page/register/Register_Page_Password.dart';
-import 'page/register/Register_Page_Name.dart';
-import 'page/register/Register_Page_Processing.dart';
+import 'package:fluro/fluro.dart';
+import 'route/routes.dart';
+import 'route/application.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider.value(value: LoginStateNotifier()),
+    ChangeNotifierProvider.value(value: RegisterInformationContainer()),
+    ChangeNotifierProvider.value(value: BrightnessNotifier()),
+  ], child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
+  MyApp() {
+    final router = FluroRouter();
+    Routes.defineRoutes(router);
+    Application.router = router;
+  }
+
   final Future<FirebaseApp> _firebaseInitialization = Firebase.initializeApp();
   // This widget is the root of your application.
   @override
@@ -30,38 +38,32 @@ class MyApp extends StatelessWidget {
         }
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
-          return MultiProvider(
-            providers: [
-              ChangeNotifierProvider.value(value: LoginStateNotifier()),
-              ChangeNotifierProvider.value(
-                  value: RegisterInformationContainer()),
-            ],
-            child: MaterialApp(
-                title: 'PicS',
-                theme: ThemeData(
+          return MaterialApp(
+            title: 'PicS',
+            theme: Provider.of<BrightnessNotifier>(context, listen: true)
+                    .darkMode
+                ? ThemeData(
                     brightness: Brightness.dark,
                     accentColor: Colors.greenAccent[400],
-                    //primaryColor: Colors.greenAccent[400],
                     scaffoldBackgroundColor: Colors.black,
                     colorScheme: ColorScheme.dark(),
                     dividerColor: Colors.greenAccent[400],
-                    //cardColor: Colors.black,
                     bottomAppBarColor: Colors.black,
                     buttonColor: Colors.greenAccent[400],
                     floatingActionButtonTheme: FloatingActionButtonThemeData(
-
                         backgroundColor: Colors.greenAccent[400]),
                     appBarTheme: AppBarTheme(backgroundColor: Colors.black),
                     bottomNavigationBarTheme: BottomNavigationBarThemeData(
                       backgroundColor: Colors.black,
-                    )),
-                home: LoginPage(),
-                routes: {
-                  "/home": (context) => HomePage(),
-                  "/login": (context) => LoginPage(),
-                  "/register": (context) => RegisterPageEmail(),
-                  "/register/processing": (context) => RegisterPageProcessing(),
-                }),
+                    ))
+                : ThemeData(
+                    brightness: Brightness.light,
+                    accentColor: Colors.greenAccent[400],
+                    primaryColor: Colors.greenAccent[400],
+                    dividerColor: Colors.greenAccent[400],
+                    buttonColor: Colors.greenAccent[400],
+                  ),
+            onGenerateRoute: Application.router.generator,
           );
         }
 

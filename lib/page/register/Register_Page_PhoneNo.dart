@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'Register_Page_Name.dart';
+import 'Register_Page_Processing.dart';
 import '../../provider/RegisterInformationContainer.dart';
 
 class RegisterPagePhoneNo extends StatelessWidget {
@@ -47,8 +47,7 @@ class RegisterPagePhoneNo extends StatelessWidget {
               child: RaisedButton(
                 child: Text("Next"),onPressed: (){
                 Provider.of<RegisterInformationContainer>(context, listen: false).setPhoneNo(phoneNoInputController.text);
-                Navigator.pushNamed(
-                    context, "/register/processing");
+                Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPageProcessing(),));
               },
               ),
             )
