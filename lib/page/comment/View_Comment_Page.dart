@@ -11,7 +11,6 @@ import '../comment/Crop_Page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
-
 class ViewCommentPage extends StatelessWidget {
   String postID, imageURL;
 
@@ -20,25 +19,36 @@ class ViewCommentPage extends StatelessWidget {
   Uint8List photoByte;
   ImageProcess.Image photo;
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
-  firebase_storage.FirebaseStorage _storageInstance = firebase_storage.FirebaseStorage.instance;
+  firebase_storage.FirebaseStorage _storageInstance =
+      firebase_storage.FirebaseStorage.instance;
 
   Future<List<QueryDocumentSnapshot>> getCommentData() async {
-    String url;
-    url = await _storageInstance.ref('/post/'+postID+'.jpg').getDownloadURL();
-
+    String url, postDocumentName;
+    url =
+        await _storageInstance.ref('/post/' + postID + '.jpg').getDownloadURL();
     var response = await http.get(url);
-
     this.photoByte = response.bodyBytes;
-
     this.photo = ImageProcess.decodeJpg(photoByte);
 
+    CollectionReference post = firestoreInstance.collection("post");
     List<QueryDocumentSnapshot> commentList;
+
+
+
+    await post.where("postID", isEqualTo: postID).get().then((data)=>{
+      postDocumentName = data.docs[0].id
+    });
+
     CollectionReference comment =
-        firestoreInstance.collection("post/" + postID + "/comment");
+    firestoreInstance.collection("post/" + postDocumentName + "/comment");
     await comment
-        .where('__name__', isGreaterThanOrEqualTo: "1")
+        .orderBy("commentID")
         .get()
         .then((data) => commentList = data.docs);
+
+
+
+    print(commentList.length);
     return commentList;
   }
 
@@ -56,6 +66,7 @@ class ViewCommentPage extends StatelessWidget {
                   MaterialPageRoute(
                       builder: (context) => CropPage(
                             photoByte: photoByte,
+                            postID: postID,
                           )),
                 );
               })

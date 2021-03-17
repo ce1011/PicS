@@ -14,7 +14,7 @@ class HomePagePost extends StatelessWidget {
     List<QueryDocumentSnapshot> postList;
     CollectionReference post = firestoreInstance.collection("post");
     await post
-        .where('__name__', isGreaterThanOrEqualTo: "1")
+        .orderBy("postID")
         .get()
         .then((data) => postList = data.docs);
     return postList;
@@ -30,7 +30,6 @@ class HomePagePost extends StatelessWidget {
             if (snapshot.hasError) {
               return Text("Error");
             } else {
-              print(snapshot.data.length);
               return Container(
                   child: SingleChildScrollView(
                 child: Column(
@@ -40,7 +39,7 @@ class HomePagePost extends StatelessWidget {
                           username: i.data()['UID'],
                           iconURL: "https://i.imgur.com/BoN9kdC.png",
                           postDate: i.data()['postTime'].toString(),
-                          postID: i.id,
+                          postID: i.data()['postID'],
                           description: i.data()['description'])
                   ],
                 ),

@@ -65,7 +65,39 @@ class _HomePageProfileState extends State<HomePageProfile> {
                       title: Text("Google"),
                       subtitle: Text("handsome123")),
                 ),
-                ListTile(subtitle: Text("Lorem ipsum dolor sit amet"))
+                ListTile(subtitle: Text("Lorem ipsum dolor sit amet")),
+                RaisedButton(onPressed: ()async{
+                  CollectionReference comment =
+                  FirebaseFirestore.instance.collection('/post/1/comment');
+
+                  String lastIndex;
+                  bool success;
+
+                  QuerySnapshot lastComment = await comment
+                      .orderBy('__name__', descending: true)
+                      .limit(1)
+                      .get();
+
+                  lastIndex = lastComment.docs[0].id;
+
+                  print(lastComment.docs[0].id);
+
+                  await comment
+                      .doc(lastIndex)
+                      .set({
+                    'UID': "testest",
+                    'commentTime': new Timestamp.now(),
+                    'content': 'test',
+                    'startX': 300,
+                    'startY': 300,
+                    'endX': 500,
+                    'endY': 500
+                  })
+                      .then((value) => success = true)
+                      .catchError((error) => success = false);
+
+                  return success;
+                }, child: Text("Create Post"),)
               ],
             )),
         Divider(
