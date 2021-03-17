@@ -4,7 +4,6 @@ import 'package:flare_flutter/flare_actor.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'register/Register_Page_PhoneNo.dart';
-import '../route/application.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController accountInputController =
@@ -17,14 +16,16 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     auth.authStateChanges().listen((User user) {
-      if (user.phoneNumber == null) {
+      if (user.phoneNumber == null && !auth.currentUser.isAnonymous) {
         print("No phone");
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),
             (route) => false);
-      } else {
-        Provider.of<LoginStateNotifier>(context, listen: false).login(user.uid);
+      } else if(!auth.currentUser.isAnonymous) {
+        Provider.of<LoginStateNotifier>(context, listen: false).login(user.uid, user.uid);
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
+      }else{
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     });
@@ -151,7 +152,7 @@ class LoginPage extends StatelessWidget {
                             print(MediaQuery.of(context).size.height);
                             print(MediaQuery.of(context).size.width);
                             print(MediaQuery.of(context).devicePixelRatio);
-                            Navigator.pushReplacementNamed(context, "/home");
+                            auth.signInAnonymously();
                           },
                           child: Text("Just looking around",
                               style: TextStyle(color: Colors.black)),

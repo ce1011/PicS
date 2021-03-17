@@ -22,6 +22,7 @@ class CommentCropPartPage extends StatelessWidget {
       this.postID});
 
   Future<bool> postComment() async {
+    /*
     CollectionReference comment =
         FirebaseFirestore.instance.collection('/post/' + postID + '/comment');
     print('/post/' + postID + '/comment');
@@ -51,8 +52,8 @@ class CommentCropPartPage extends StatelessWidget {
         })
         .then((value) => success = true)
         .catchError((error) => success = false);
-
-    return success;
+*/
+    return true;
   }
 
   @override

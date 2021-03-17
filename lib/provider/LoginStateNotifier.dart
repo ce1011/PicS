@@ -2,14 +2,15 @@ import 'package:flutter/foundation.dart';
 
 class LoginStateNotifier with ChangeNotifier {
   bool _login = false;
-  int UID;
+  String UID;
   String name = "dick",account;
 
   bool get loginState => _login;
 
-  login(String name) {
+  login(String name, String UID) {
     _login = true;
     this.name = name;
+    this.UID = UID;
     notifyListeners();
   }
 

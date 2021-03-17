@@ -5,6 +5,7 @@ import 'createClip/pickImage.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import 'chat/Select_Chat_Page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  FirebaseAuth auth = FirebaseAuth.instance;
   int selectedHomePage = 0;
   List<Widget> widgetList = <Widget>[HomePagePost(), HomePageProfile()];
 
@@ -79,22 +81,31 @@ class _HomePageState extends State<HomePage> {
                 : 0,
           ),
           child: widgetList.elementAt(selectedHomePage)),
-      bottomNavigationBar: BottomNavigationBar(
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(icon: Icon(Icons.post_add), label: "Post"),
-            BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile")
-          ],
-          currentIndex: selectedHomePage,
-          onTap: onTap,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          type: BottomNavigationBarType.fixed,
-          elevation: 0),
+      bottomNavigationBar:
+          (Provider.of<LoginStateNotifier>(context, listen: false).loginState ==
+                  true)
+              ? BottomNavigationBar(
+                  items: <BottomNavigationBarItem>[
+                      BottomNavigationBarItem(
+                          icon: Icon(Icons.post_add), label: "Post"),
+                      BottomNavigationBarItem(
+                          icon: Icon(Icons.person), label: "Profile")
+                    ],
+                  currentIndex: selectedHomePage,
+                  onTap: onTap,
+                  showSelectedLabels: false,
+                  showUnselectedLabels: false,
+                  type: BottomNavigationBarType.fixed,
+                  elevation: 0)
+              : null,
       floatingActionButton:
           (Provider.of<LoginStateNotifier>(context, listen: false).loginState ==
                   true)
               ? FloatingActionButton(
-                  child: Icon(Icons.post_add, color: Colors.grey[900],),
+                  child: Icon(
+                    Icons.post_add,
+                    color: Colors.grey[900],
+                  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -102,8 +113,22 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                 )
-              : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+              : FloatingActionButton(
+                  child: Icon(
+                    Icons.logout,
+                    color: Colors.grey[900],
+                  ),
+                  onPressed: () {
+                    auth.signOut();
+                    Provider.of<LoginStateNotifier>(context, listen: false).logout();
+                    Navigator.popAndPushNamed(context, "/");
+                  },
+                ),
+      floatingActionButtonLocation:
+          (Provider.of<LoginStateNotifier>(context, listen: false).loginState ==
+                  true)
+              ? FloatingActionButtonLocation.centerDocked
+              : FloatingActionButtonLocation.endFloat,
     );
   }
 }

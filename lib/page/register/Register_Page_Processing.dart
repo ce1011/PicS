@@ -135,7 +135,7 @@ class _RegisterPageProcessingState extends State<RegisterPageProcessing> {
 
                           if (pass == true) {
                             Provider.of<LoginStateNotifier>(context, listen: false)
-                                .login(auth.currentUser.uid);
+                                .login(auth.currentUser.uid, auth.currentUser.uid);
                             Navigator.pushNamedAndRemoveUntil(
                                 context, '/home', (route) => false);
                           }
