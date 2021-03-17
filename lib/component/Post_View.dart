@@ -64,7 +64,7 @@ class _PostViewState extends State<PostView> {
                       IconButton(
                         icon: Icon(Icons.comment),
                         onPressed: () {
-                          Navigator.pushNamed(context, "/post/1/comment");
+                          Navigator.pushNamed(context, "/post/${widget.postID}/comment");
                         },
                       ),
                       IconButton(icon: Icon(Icons.forward)),

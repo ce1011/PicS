@@ -10,18 +10,6 @@ import 'package:flutter/foundation.dart';
 class HomePagePost extends StatelessWidget {
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
 
-  FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
-  FirebasePostDataAgent firebasePostDataAgent = FirebasePostDataAgent();
-
-  Future<String> getPostImageURL(String postID) async {
-    String downloadURL = await firebase_storage.FirebaseStorage.instance
-        .ref('users/123/avatar.jpg')
-        .getDownloadURL();
-    return downloadURL;
-    // Within your widgets:
-    // Image.network(downloadURL);
-  }
-
   Future<List<QueryDocumentSnapshot>> getPost() async {
     List<QueryDocumentSnapshot> postList;
     CollectionReference post = firestoreInstance.collection("post");
