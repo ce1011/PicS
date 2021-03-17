@@ -8,8 +8,9 @@ class FirebasePostDataAgent{
   firebase_storage.FirebaseStorage _storageInstance = firebase_storage.FirebaseStorage.instance;
 
   Future<String> getPostImageURL(String postID) async {
-
-    return "test";
+    String url;
+    url = await _storageInstance.ref('/post/'+postID+'.jpg').getDownloadURL();
+    return url;
   }
 
 }

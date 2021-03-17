@@ -7,25 +7,11 @@ import '../../firebase/Firebase_User_Data_Agent.dart';
 import '../../firebase/Firebase_Post_Data_Agent.dart';
 import 'package:flutter/foundation.dart';
 
-class HomePagePost extends StatefulWidget {
-  @override
-  _HomePagePostState createState() => _HomePagePostState();
-}
-
-class _HomePagePostState extends State<HomePagePost> {
+class HomePagePost extends StatelessWidget {
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
 
   FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
   FirebasePostDataAgent firebasePostDataAgent = FirebasePostDataAgent();
-
-  QuerySnapshot postList;
-
-  @override
-  void initState() {
-    super.initState();
-
-    getPost();
-  }
 
   Future<String> getPostImageURL(String postID) async {
     String downloadURL = await firebase_storage.FirebaseStorage.instance
@@ -36,37 +22,45 @@ class _HomePagePostState extends State<HomePagePost> {
     // Image.network(downloadURL);
   }
 
-  Future<QuerySnapshot> getPost() async {
+  Future<List<QueryDocumentSnapshot>> getPost() async {
+    List<QueryDocumentSnapshot> postList;
     CollectionReference post = firestoreInstance.collection("post");
-    post
+    await post
         .where('__name__', isGreaterThanOrEqualTo: "1")
         .get()
-        .then((data) => print(data.docs[0].data().toString()));
-
-    CollectionReference comment =
-        firestoreInstance.collection("post/1/comment");
-    return comment.get();
+        .then((data) => postList = data.docs);
+    return postList;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        child: SingleChildScrollView(
-            child: Column(
-      children: [
-        PostView(
-            username: "Ted Chan",
-            iconURL:"https://i.imgur.com/BoN9kdC.png",
-            postDate:"Posted at 31 Feb 2021 23:59",
-            imageURL: kIsWeb ? "https://sehh3140_pics.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg" : 'https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg',
-            description: "12312321312312"),
-        PostView(
-            username:  "Chan wai ho",
-            iconURL:"https://flutter.github.io/assets-for-api-docs/assets/widgets/owl-2.jpg",
-            postDate:"Posted at 25 Feb 2020 12:00",
-            imageURL:kIsWeb ? "https://sehh3140_pics.gitlab.io/sehh3140_frontend_page/ultraviolet-wallpaper-1280x720-wallpaper.jpg" : 'https://free4kwallpapers.com/uploads/wallpaper/ultraviolet-wallpaper-1280x720-wallpaper.jpg',
-            description: "testtesttest"),
-      ],
-    )));
+    return FutureBuilder<List<QueryDocumentSnapshot>>(
+        future: getPost(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasError) {
+              return Text("Error");
+            } else {
+              print(snapshot.data.length);
+              return Container(
+                  child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    for (var i in snapshot.data)
+                      PostView(
+                          username: i.data()['UID'],
+                          iconURL: "https://i.imgur.com/BoN9kdC.png",
+                          postDate: i.data()['postTime'].toString(),
+                          postID: i.id,
+                          description: i.data()['description'])
+                  ],
+                ),
+              ));
+            }
+          } else {
+            return CircularProgressIndicator();
+          }
+        });
   }
 }

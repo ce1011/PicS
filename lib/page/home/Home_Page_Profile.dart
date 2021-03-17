@@ -82,8 +82,8 @@ class _HomePageProfileState extends State<HomePageProfile> {
                     iconURL:
                         "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg",
                     postDate: "Posted at 31 Feb 2021 23:59",
-                    imageURL:
-                        "https://i1.wp.com/9to5mac.com/wp-content/uploads/sites/6/2020/01/Every-Mac-wallpaper.jpeg?w=2000&quality=82&strip=all&ssl=1",
+                    postID:
+                        "2",
                     description:
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
                 PostView(
@@ -91,8 +91,8 @@ class _HomePageProfileState extends State<HomePageProfile> {
                     iconURL:
                         "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg",
                     postDate: "Posted at 31 Feb 2021 23:59",
-                    imageURL:
-                        "https://i1.wp.com/9to5mac.com/wp-content/uploads/sites/6/2020/01/Every-Mac-wallpaper.jpeg?w=2000&quality=82&strip=all&ssl=1",
+                    postID:
+                        "1",
                     description:
                         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
                 RaisedButton(
