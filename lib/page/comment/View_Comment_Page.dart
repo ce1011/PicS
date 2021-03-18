@@ -24,31 +24,26 @@ class ViewCommentPage extends StatelessWidget {
 
   Future<List<QueryDocumentSnapshot>> getCommentData() async {
     String url, postDocumentName;
+    List<QueryDocumentSnapshot> commentList;
     url =
         await _storageInstance.ref('/post/' + postID + '.jpg').getDownloadURL();
+
     var response = await http.get(url);
     this.photoByte = response.bodyBytes;
     this.photo = ImageProcess.decodeJpg(photoByte);
 
     CollectionReference post = firestoreInstance.collection("post");
-    List<QueryDocumentSnapshot> commentList;
 
-
-
-    await post.where("postID", isEqualTo: postID).get().then((data)=>{
-      postDocumentName = data.docs[0].id
-    });
-
-    CollectionReference comment =
-    firestoreInstance.collection("post/" + postDocumentName + "/comment");
-    await comment
-        .orderBy("commentID")
+    await post
+        .where("postID", isEqualTo: int.parse(postID))
+        .get()
+        .then((data) => {postDocumentName = data.docs[0].id});
+    print("post/" + postDocumentName + "/comment");
+    await firestoreInstance
+        .collection("post/" + postDocumentName + "/comment")
+    .orderBy("commentID")
         .get()
         .then((data) => commentList = data.docs);
-
-
-
-    print(commentList.length);
     return commentList;
   }
 
@@ -61,10 +56,12 @@ class ViewCommentPage extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.add_comment),
               onPressed: () {
+                print(postID);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => CropPage(
+
                             photoByte: photoByte,
                             postID: postID,
                           )),

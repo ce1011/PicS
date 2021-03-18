@@ -39,7 +39,7 @@ class HomePagePost extends StatelessWidget {
                           username: i.data()['UID'],
                           iconURL: "https://i.imgur.com/BoN9kdC.png",
                           postDate: i.data()['postTime'].toString(),
-                          postID: i.data()['postID'],
+                          postID: i.data()['postID'].toString(),
                           description: i.data()['description'])
                   ],
                 ),

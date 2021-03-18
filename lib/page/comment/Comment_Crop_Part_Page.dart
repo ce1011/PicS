@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image/image.dart' as ImageProcess;
 import '../../component/Comment_Crop_Photo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../provider/LoginStateNotifier.dart';
+import 'package:provider/provider.dart';
 
 class CommentCropPartPage extends StatelessWidget {
   final Uint8List photoByte;
@@ -21,39 +23,42 @@ class CommentCropPartPage extends StatelessWidget {
       this.EndY,
       this.postID});
 
-  Future<bool> postComment() async {
-    /*
-    CollectionReference comment =
-        FirebaseFirestore.instance.collection('/post/' + postID + '/comment');
-    print('/post/' + postID + '/comment');
+  Future<bool> postComment(String UID) async {
+    String postDocumentName;
+    CollectionReference post = FirebaseFirestore.instance.collection("post");
 
-    String lastIndex;
+    await post
+        .where("postID", isEqualTo: int.parse(postID))
+        .get()
+        .then((data) => {postDocumentName = data.docs[0].id});
+
+
+    CollectionReference comment =
+    FirebaseFirestore.instance.collection('/post/'+postDocumentName+'/comment');
+
+    int lastIndex;
     bool success;
 
     QuerySnapshot lastComment = await comment
-        .orderBy('__name__', descending: true)
+        .orderBy('commentID', descending: true)
         .limit(1)
         .get();
-
-    lastIndex = lastComment.docs[0].id;
-
-    print(lastComment.docs[0].id);
-
+    lastIndex = lastComment.docs[0].data()['commentID'];
     await comment
-        .doc(lastIndex)
-        .set({
-          'UID': "testest",
-          'commentTime': new Timestamp.now(),
-          'content': commentInputController.text.toString(),
-          'startX': StartX,
-          'startY': StartY,
-          'endX': EndX,
-          'endY': EndY
-        })
+        .add({
+      'commentID': lastIndex+1,
+      'UID': UID,
+      'commentTime': new Timestamp.now(),
+      'content': commentInputController.text,
+      'startX': StartX,
+      'startY': StartY,
+      'endX': EndX,
+      'endY': EndY
+    })
         .then((value) => success = true)
         .catchError((error) => success = false);
-*/
-    return true;
+
+    return success;
   }
 
   @override
@@ -65,7 +70,7 @@ class CommentCropPartPage extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.send),
               onPressed: () async {
-                if (await postComment() == true) {
+                if (await postComment(Provider.of<LoginStateNotifier>(context, listen: false).UID) == true) {
                   int count = 0;
                   Navigator.popUntil(context, (route) {
                     return count++ == 2;

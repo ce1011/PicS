@@ -21,7 +21,6 @@ class _CropPageState extends State<CropPage> {
   final cropKey = GlobalKey<CropState>();
 
   int StartX, StartY, EndX, EndY;
-  String postID;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +57,7 @@ class _CropPageState extends State<CropPage> {
                           StartY: StartY,
                           EndX: EndX,
                           EndY: EndY,
-                          postID: postID,
+                          postID: widget.postID,
                         )),
               );
             })

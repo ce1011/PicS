@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../component/Circle_Icon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../setting/Setting.dart';
 import '../../component/Post_View.dart';
 
@@ -51,6 +50,35 @@ class HomePageProfile extends StatelessWidget {
                       subtitle: Text("handsome123")),
                 ),
                 ListTile(subtitle: Text("Lorem ipsum dolor sit amet")),
+                RaisedButton(onPressed: ()async {
+                  CollectionReference comment =
+                  FirebaseFirestore.instance.collection('/post/mLGYRFf9B5DKhh6zybFq/comment');
+
+                  int lastIndex;
+                  bool success;
+
+                  QuerySnapshot lastComment = await comment
+                      .orderBy('commentID', descending: true)
+                      .limit(1)
+                      .get();
+
+                  lastIndex = lastComment.docs[0].data()['commentID'];
+
+
+                  await comment
+                      .add({
+                    'commentID': lastIndex+1,
+                    'UID': "testest",
+                    'commentTime': new Timestamp.now(),
+                    'content': "testest",
+                    'startX': 200,
+                    'startY': 200,
+                    'endX': 500,
+                    'endY': 500
+                  })
+                      .then((value) => success = true)
+                      .catchError((error) => success = false);
+                })
               ],
             )),
         Divider(
@@ -76,7 +104,7 @@ class HomePageProfile extends StatelessWidget {
                                 username: i.data()['UID'],
                                 iconURL: "https://i.imgur.com/BoN9kdC.png",
                                 postDate: i.data()['postTime'].toString(),
-                                postID: i.data()['postID'],
+                                postID: i.data()['postID'].toString(),
                                 description: i.data()['description']),
                           RaisedButton(
                             child: Text("Log Out"),
