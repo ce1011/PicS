@@ -2,6 +2,7 @@ image: cirrusci/flutter:latest
 
 variables:
 before_script:
+  - flutter channel stable
   - flutter upgrade
   - flutter pub get
 pages:
