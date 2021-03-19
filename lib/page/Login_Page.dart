@@ -23,7 +23,7 @@ class LoginPage extends StatelessWidget {
             context,
             MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),
             (route) => false);
-      } else if(!auth.currentUser.isAnonymous) {
+      } else if (!auth.currentUser.isAnonymous) {
         FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
 
         CollectionReference profile = firestoreInstance.collection("user");
@@ -31,18 +31,20 @@ class LoginPage extends StatelessWidget {
             .where('UID', isEqualTo: user.uid)
             .get()
             .then((data) => {
-        Provider.of<LoginStateNotifier>(context, listen: false).setDisplayName(data.docs[0].data()['displayName'])
-          ,Provider.of<LoginStateNotifier>(context, listen: false).setUsername(data.docs[0].data()['username'])
-        });
-
-        Provider.of<LoginStateNotifier>(context, listen: false).login(user.uid);
-
-        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
-      }else{
+                  Provider.of<LoginStateNotifier>(context, listen: false)
+                      .setDisplayName(data.docs[0].data()['displayName']),
+                  Provider.of<LoginStateNotifier>(context, listen: false)
+                      .setUsername(data.docs[0].data()['username'])
+                })
+            .then((value) =>
+                Provider.of<LoginStateNotifier>(context, listen: false)
+                    .login(user.uid))
+            .then((value) => Navigator.pushNamedAndRemoveUntil(
+                context, '/home', (route) => false));
+      } else {
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     });
-
 
     return Scaffold(
         body: Builder(
