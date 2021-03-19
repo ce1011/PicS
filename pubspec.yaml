@@ -28,7 +28,7 @@ dependencies:
   http: ^0.12.2
   path_provider:
   path:
-  image: ^2.1.19
+  image: 2.1.19
   image_crop: ^0.3.4
   device_info: ^1.0.0
   image_picker: ^0.6.7+22
