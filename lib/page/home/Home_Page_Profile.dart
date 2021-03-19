@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../component/Circle_Icon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
-import '../setting/Setting.dart';
 import '../../component/Post_View.dart';
 
 class HomePageProfile extends StatelessWidget {
@@ -65,9 +64,11 @@ class HomePageProfile extends StatelessWidget {
                         child: ListTile(
                             leading: CircleIcon(
                                 url:
-                                "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg"),
-                            title: Text(snapshot.data['displayName']),
-                            subtitle: Text(snapshot.data['username'])),
+                                    "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg"),
+                            title: Text(            Provider.of<LoginStateNotifier>(context, listen: false)
+                                .displayName),
+                            subtitle: Text(Provider.of<LoginStateNotifier>(context, listen: false)
+                                .username)),
                       ),
                       ListTile(subtitle: Text(snapshot.data['description'])),
                     ],
@@ -90,42 +91,25 @@ class HomePageProfile extends StatelessWidget {
                 if (snapshot.hasError) {
                   return Text("Error");
                 } else {
-                  return snapshot.data.isEmpty ? Text("No post"): Expanded(
-                    flex: 7,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          for (var i in snapshot.data)
-                            PostView(
-                                username: i.data()['UID'],
-                                iconURL: "https://i.imgur.com/BoN9kdC.png",
-                                postDate: i.data()['postTime'].toString(),
-                                postID: i.data()['postID'].toString(),
-                                description: i.data()['description']),
-                          RaisedButton(
-                            child: Text("Log Out"),
-                            onPressed: () {
-                              auth.signOut();
-                              Provider.of<LoginStateNotifier>(context,
-                                      listen: false)
-                                  .logout();
-                              Navigator.popAndPushNamed(context, "/");
-                            },
+                  return snapshot.data.isEmpty
+                      ? Text("No post")
+                      : Expanded(
+                          flex: 7,
+                          child: SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                for (var i in snapshot.data)
+                                  PostView(
+                                      username: i.data()['UID'],
+                                      iconURL:
+                                          "https://i.imgur.com/BoN9kdC.png",
+                                      postDate: i.data()['postTime'],
+                                      postID: i.data()['postID'].toString(),
+                                      description: i.data()['description']),
+                              ],
+                            ),
                           ),
-                          RaisedButton(
-                            child: Text("Setting"),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SettingPage()),
-                              );
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                  );
+                        );
                 }
               } else {
                 return CircularProgressIndicator();

@@ -86,7 +86,7 @@ class ViewCommentPage extends StatelessWidget {
                       child: CommentView(
                         username: i.data()['UID'],
                         iconURL: "https://i.imgur.com/BoN9kdC.png",
-                        commentDate: i.data()['commentTime'].toString(),
+                        commentDate: i.data()['commentTime'],
                         photoByte: photoByte,
                         StartX: i.data()['startX'],
                         StartY: i.data()['startY'],

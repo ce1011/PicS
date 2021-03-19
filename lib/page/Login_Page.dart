@@ -4,6 +4,7 @@ import 'package:flare_flutter/flare_actor.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'register/Register_Page_PhoneNo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController accountInputController =
@@ -23,12 +24,25 @@ class LoginPage extends StatelessWidget {
             MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),
             (route) => false);
       } else if(!auth.currentUser.isAnonymous) {
-        Provider.of<LoginStateNotifier>(context, listen: false).login(user.uid, user.uid);
+        FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
+        CollectionReference profile = firestoreInstance.collection("user");
+        profile
+            .where('UID', isEqualTo: user.uid)
+            .get()
+            .then((data) => {
+        Provider.of<LoginStateNotifier>(context, listen: false).setDisplayName(data.docs[0].data()['displayName'])
+          ,Provider.of<LoginStateNotifier>(context, listen: false).setUsername(data.docs[0].data()['username'])
+        });
+
+        Provider.of<LoginStateNotifier>(context, listen: false).login(user.uid);
+
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }else{
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     });
+
 
     return Scaffold(
         body: Builder(

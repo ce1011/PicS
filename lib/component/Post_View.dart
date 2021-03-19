@@ -1,11 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'Circle_Icon.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class PostView extends StatefulWidget {
-  String username, iconURL, postDate, postID, description;
-  PostView({@required username,@required String iconURL,@required String postDate,@required String postID,@required String description}){
+  String username, iconURL, postID, description;
+  Timestamp postDate;
+  PostView({@required username,@required String iconURL,@required Timestamp postDate,@required String postID,@required String description}){
     this.username = username;
     this.iconURL = iconURL;
     this.postDate = postDate;
@@ -45,7 +47,7 @@ class _PostViewState extends State<PostView> {
                 dense: true,
                 leading: CircleIcon(url: widget.iconURL),
                 title: Text(widget.username),
-                subtitle: Text(widget.postDate),
+                subtitle: Text("Post at "+DateTime.fromMillisecondsSinceEpoch(widget.postDate.millisecondsSinceEpoch).toLocal().toString().substring(0,19)),
               ),
               Divider(),
               Container(

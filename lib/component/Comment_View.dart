@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'Circle_Icon.dart';
 import 'Comment_Crop_Photo.dart';
 import 'dart:typed_data';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CommentView extends StatefulWidget {
-  String username, iconURL, commentDate, description;
+  String username, iconURL, description;
+  Timestamp commentDate;
   int StartX, StartY, EndX, EndY;
   Uint8List photoByte;
 
-  CommentView({@required username,@required String iconURL,@required String commentDate,@required Uint8List photoByte,@required int StartX,@required int StartY,@required int EndX,@required int EndY, @required String description}){
+  CommentView({@required username,@required String iconURL,@required Timestamp commentDate,@required Uint8List photoByte,@required int StartX,@required int StartY,@required int EndX,@required int EndY, @required String description}){
     this.username = username;
     this.iconURL = iconURL;
     this.commentDate = commentDate;
@@ -34,7 +36,7 @@ class _CommentViewState extends State<CommentView> {
           leading: CircleIcon(
               url: widget.iconURL),
           title: Text(widget.username),
-          subtitle: Text(widget.commentDate),
+          subtitle: Text("Comment at "+DateTime.fromMillisecondsSinceEpoch(widget.commentDate.millisecondsSinceEpoch).toLocal().toString().substring(0,19)),
         ),
         Divider(
           color: Colors.greenAccent[400],

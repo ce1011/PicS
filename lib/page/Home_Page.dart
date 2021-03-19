@@ -6,6 +6,8 @@ import '../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import 'chat/Select_Chat_Page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'setting/Setting.dart';
+import '../component/Circle_Icon.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -38,7 +40,8 @@ class _HomePageState extends State<HomePage> {
     Future(() {
       final snackBar = SnackBar(
         content: Text("Signed in as " +
-            Provider.of<LoginStateNotifier>(context, listen: false).name),
+            Provider.of<LoginStateNotifier>(context, listen: false)
+                .displayName),
         behavior: SnackBarBehavior.floating,
         duration: Duration(seconds: 1, milliseconds: 500),
       );
@@ -71,6 +74,38 @@ class _HomePageState extends State<HomePage> {
               : Container()
         ],
       ),
+      drawer: Drawer(
+          child: ListView(
+        children: [
+          ListTile(
+            leading: CircleIcon(
+                url:
+                    "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg"),
+            title: Text(Provider.of<LoginStateNotifier>(context, listen: false)
+                .displayName),
+            subtitle: Text(
+                Provider.of<LoginStateNotifier>(context, listen: false)
+                    .username),
+          ),
+          ListTile(
+            title: Text('Setting'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingPage()),
+              );
+            },
+          ),
+          ListTile(
+            title: Text('Log Out'),
+            onTap: () {
+              auth.signOut();
+              Provider.of<LoginStateNotifier>(context, listen: false).logout();
+              Navigator.popAndPushNamed(context, "/");
+            },
+          )
+        ],
+      )),
       body: Container(
           padding: EdgeInsets.only(
             left: (MediaQuery.of(context).size.width >= 1080.0)
@@ -120,7 +155,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                   onPressed: () {
                     auth.signOut();
-                    Provider.of<LoginStateNotifier>(context, listen: false).logout();
+                    Provider.of<LoginStateNotifier>(context, listen: false)
+                        .logout();
                     Navigator.popAndPushNamed(context, "/");
                   },
                 ),
