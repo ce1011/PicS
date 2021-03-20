@@ -88,8 +88,10 @@ class _HomePageState extends State<HomePage> {
                     .username),
           ),
           ListTile(
+            leading: Icon(Icons.settings),
             title: Text('Setting'),
             onTap: () {
+              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => SettingPage()),
@@ -97,6 +99,7 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           ListTile(
+            leading: Icon(Icons.logout),
             title: Text('Log Out'),
             onTap: () {
               auth.signOut();

@@ -4,11 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:pics/page/register/Register_Page_PhoneNo.dart';
 import '../../provider/RegisterInformationContainer.dart';
+import '../../provider/LoginStateNotifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPagePassword extends StatelessWidget {
   final TextEditingController passwordInputController =
   new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,13 +37,13 @@ class RegisterPagePassword extends StatelessWidget {
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                   prefixIcon:
-                      Icon(Icons.vpn_key_outlined, color: Color(0xFF2308423)),
+                  Icon(Icons.vpn_key_outlined, color: Color(0xFF2308423)),
                   labelText: "Password",
                   enabledBorder: OutlineInputBorder(
                       borderSide: new BorderSide(color: Color(0xFF2308423))),
                   focusedBorder: OutlineInputBorder(
                       borderSide:
-                          new BorderSide(color: Colors.greenAccent[400])),
+                      new BorderSide(color: Colors.greenAccent[400])),
                 ),
               ),
             ),
@@ -48,14 +51,53 @@ class RegisterPagePassword extends StatelessWidget {
               child: RaisedButton(
                 child: Text("Next"),
                 onPressed: () async {
-                  Provider.of<RegisterInformationContainer>(context, listen: false).setPassword(passwordInputController.text);
+                  Provider.of<RegisterInformationContainer>(context,
+                      listen: false)
+                      .setPassword(passwordInputController.text);
 
-                  UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: Provider.of<RegisterInformationContainer>(context, listen: false).getEmail(),
-                      password: Provider.of<RegisterInformationContainer>(context, listen: false).getPassword()
-                  );
+                  CollectionReference user =
+                  FirebaseFirestore.instance.collection("user");
 
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),);
+                  UserCredential userCredential = await FirebaseAuth.instance
+                      .createUserWithEmailAndPassword(
+                      email: Provider.of<RegisterInformationContainer>(
+                          context,
+                          listen: false)
+                          .getEmail(),
+                      password: Provider.of<RegisterInformationContainer>(
+                          context,
+                          listen: false)
+                          .getPassword());
+
+                  await user.add({
+                    'UID': userCredential.user.uid,
+                    'displayName': Provider.of<RegisterInformationContainer>(
+                        context,
+                        listen: false)
+                        .getDisplayName(),
+                    'username': Provider.of<RegisterInformationContainer>(
+                        context,
+                        listen: false)
+                        .getName(),
+                    'description': ""
+                  }).then(
+                          (value) =>
+                          Provider.of<LoginStateNotifier>(context,
+                              listen: false)
+                              .setDisplayName(
+                              Provider.of<RegisterInformationContainer>(context,
+                                  listen: false)
+                                  .getDisplayName())).then((value) =>
+                      Provider.of<LoginStateNotifier>(context, listen: false)
+                          .setUsername(
+                          Provider.of<RegisterInformationContainer>(context,
+                              listen: false)
+                              .getName())).then((value) =>
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RegisterPagePhoneNo()),
+                      ));
                 },
               ),
             )
@@ -64,3 +106,4 @@ class RegisterPagePassword extends StatelessWidget {
         ));
   }
 }
+

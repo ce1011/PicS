@@ -3,6 +3,7 @@ import 'Circle_Icon.dart';
 import 'Comment_Crop_Photo.dart';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../firebase/Firebase_User_Data_Agent.dart';
 
 class CommentView extends StatefulWidget {
   String username, iconURL, description;
@@ -27,6 +28,8 @@ class CommentView extends StatefulWidget {
 }
 
 class _CommentViewState extends State<CommentView> {
+  FirebaseUserDataAgent userAgent = new FirebaseUserDataAgent();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -35,7 +38,21 @@ class _CommentViewState extends State<CommentView> {
           dense: true,
           leading: CircleIcon(
               url: widget.iconURL),
-          title: Text(widget.username),
+          title: FutureBuilder(
+            future: userAgent.getDisplayName(widget.username),
+            builder: (BuildContext context,
+                AsyncSnapshot<String> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return Text("Error");
+                } else {
+                  return Text(snapshot.data);
+                }
+              } else {
+                return Text(" ");
+              }
+            },
+          ),
           subtitle: Text("Comment at "+DateTime.fromMillisecondsSinceEpoch(widget.commentDate.millisecondsSinceEpoch).toLocal().toString().substring(0,19)),
         ),
         Divider(

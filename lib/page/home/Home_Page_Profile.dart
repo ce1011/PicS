@@ -7,9 +7,11 @@ import '../../component/Circle_Icon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
 import '../../component/Post_View.dart';
+import '../Profile_Edit_Page.dart';
 
 class HomePageProfile extends StatelessWidget {
   String UID;
+  String description;
 
   HomePageProfile({Key key, @required this.UID}) : super(key: key);
 
@@ -40,6 +42,7 @@ class HomePageProfile extends StatelessWidget {
         .get()
         .then((data) => profileInformation = data.docs[0]);
 
+    description = profileInformation.data()['description'];
     return profileInformation;
   }
 
@@ -48,36 +51,35 @@ class HomePageProfile extends StatelessWidget {
     return Container(
         child: Column(
       children: [
-        FutureBuilder(
-            future: getProfileInformation(
-                Provider.of<LoginStateNotifier>(context, listen: false).UID),
-            builder: (BuildContext context,
-                AsyncSnapshot<QueryDocumentSnapshot> snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return Text("Error");
-                } else {
-                  return Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(top: 10.0),
-                        child: ListTile(
-                            leading: CircleIcon(
-                                url:
-                                    "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg"),
-                            title: Text(            Provider.of<LoginStateNotifier>(context, listen: false)
-                                .displayName),
-                            subtitle: Text(Provider.of<LoginStateNotifier>(context, listen: false)
-                                .username)),
-                      ),
-                      ListTile(subtitle: Text(snapshot.data['description'])),
-                    ],
-                  );
-                }
-              } else {
-                return CircularProgressIndicator();
-              }
-            }),
+        Column(
+          children: [
+            Container(
+              padding: EdgeInsets.only(top: 10.0),
+              child: ListTile(
+                  leading: CircleIcon(
+                      url:
+                          "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg"),
+                  title: Text(
+                      Provider.of<LoginStateNotifier>(context, listen: true)
+                          .displayName),
+                  subtitle: Text(
+                      Provider.of<LoginStateNotifier>(context, listen: true)
+                          .username)),
+            ),
+            ListTile(
+                subtitle: Text(
+                    Provider.of<LoginStateNotifier>(context, listen: true)
+                        .getDescription())),
+            RaisedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfileEditPage()));
+                },
+                child: Text("Edit profile"))
+          ],
+        ),
         Divider(
           color: Colors.greenAccent[400],
         ),

@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
   }
 
   final Future<FirebaseApp> _firebaseInitialization = Firebase.initializeApp();
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -55,7 +56,9 @@ class MyApp extends StatelessWidget {
                     appBarTheme: AppBarTheme(backgroundColor: Colors.black),
                     bottomNavigationBarTheme: BottomNavigationBarThemeData(
                       backgroundColor: Colors.black,
-                    ))
+                    ),
+                    canvasColor: Colors.black,
+                  )
                 : ThemeData(
                     brightness: Brightness.light,
                     accentColor: Colors.greenAccent[400],

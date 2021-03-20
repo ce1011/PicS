@@ -34,7 +34,9 @@ class LoginPage extends StatelessWidget {
                   Provider.of<LoginStateNotifier>(context, listen: false)
                       .setDisplayName(data.docs[0].data()['displayName']),
                   Provider.of<LoginStateNotifier>(context, listen: false)
-                      .setUsername(data.docs[0].data()['username'])
+                      .setUsername(data.docs[0].data()['username']),
+          Provider.of<LoginStateNotifier>(context, listen: false)
+              .setDescription(data.docs[0].data()['description'])
                 })
             .then((value) =>
                 Provider.of<LoginStateNotifier>(context, listen: false)

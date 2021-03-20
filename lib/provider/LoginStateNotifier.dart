@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 class LoginStateNotifier with ChangeNotifier {
   bool _login = false;
   String UID;
-  String displayName, username;
+  String displayName, username, description;
 
   bool get loginState => _login;
 
@@ -23,8 +23,29 @@ class LoginStateNotifier with ChangeNotifier {
     notifyListeners();
   }
 
+  setDescription(String description){
+    this.description = description;
+    notifyListeners();
+  }
+
+  getDescription(){
+    return description;
+  }
+
+  getUsername(){
+    return username;
+  }
+
+  getDisplayName(){
+    return displayName;
+  }
+
   logout() {
     _login = false;
     notifyListeners();
+  }
+
+  getUID(){
+    return UID;
   }
 }

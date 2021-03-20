@@ -11,9 +11,39 @@ class FirebaseUserDataAgent{
 
   }
 
-  Future<String> getUserName(String UID){
+  Future<String> getDocumentID(String UID) async{
+    String documentID;
 
+    await _fireStoreInstance
+        .where('UID', isEqualTo: UID)
+        .get()
+        .then((data) => documentID = data.docs[0].id);
+
+    return documentID;
   }
+
+  Future<String> getUserName(String UID) async{
+    String username;
+
+    await _fireStoreInstance
+        .where('UID', isEqualTo: UID)
+        .get()
+        .then((data) => username = data.docs[0].data()['username']);
+
+    return username;
+  }
+
+  Future<String> getDisplayName(String UID) async{
+    String displayName;
+
+    await _fireStoreInstance
+        .where('UID', isEqualTo: UID)
+        .get()
+        .then((data) => displayName = data.docs[0].data()['displayName']);
+
+    return displayName;
+  }
+
 
   Future<String> getUserPersonalDescription(String UID){
 

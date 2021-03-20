@@ -71,6 +71,14 @@ class ViewCommentPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
           child: Container(
+              padding: EdgeInsets.only(
+                left: (MediaQuery.of(context).size.width >= 1080.0)
+                    ? (MediaQuery.of(context).size.width) * 0.25
+                    : 0,
+                right: (MediaQuery.of(context).size.width >= 1080.0)
+                    ? (MediaQuery.of(context).size.width) * 0.25
+                    : 0,
+              ),
               child: FutureBuilder<List<QueryDocumentSnapshot>>(
         future: getCommentData(),
         builder: (BuildContext context,

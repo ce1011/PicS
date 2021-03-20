@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 
 class RegisterInformationContainer with ChangeNotifier {
-  String email, name, password, phoneno;
+  String email, userName, password, phoneno, displayName;
 
   setName(String name){
-    this.name = name;
+    this.userName = name;
   }
 
   setEmail(String email){
@@ -19,8 +19,12 @@ class RegisterInformationContainer with ChangeNotifier {
     this.phoneno = phoneno;
   }
 
+  setDisplayName(String displayName){
+    this.displayName = displayName;
+  }
+
   String getName(){
-    return name;
+    return userName;
   }
 
   String getEmail(){
@@ -33,5 +37,9 @@ class RegisterInformationContainer with ChangeNotifier {
 
   String getPhoneNo(){
     return phoneno;
+  }
+
+  String getDisplayName(){
+    return displayName;
   }
 }
