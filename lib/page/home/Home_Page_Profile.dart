@@ -7,7 +7,7 @@ import '../../component/Circle_Icon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
 import '../../component/Post_View.dart';
-import '../Profile_Edit_Page.dart';
+import '../profile/Profile_Edit_Page.dart';
 
 class HomePageProfile extends StatelessWidget {
   String UID;

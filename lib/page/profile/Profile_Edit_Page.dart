@@ -1,4 +1,4 @@
-import '../provider/LoginStateNotifier.dart';
+import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -27,8 +27,7 @@ class ProfileEditPage extends StatelessWidget {
         .get()
         .then((data) => UID = data.docs[0].id);
 
-    await profile.doc("/" + UID).set({
-      "UID": Provider.of<LoginStateNotifier>(context, listen: false).getUID(),
+    await profile.doc("/" + UID).update({
       "displayName": displayNameInputController.text,
       "username": userNameInputController.text,
       "description": descriptionInputController.text

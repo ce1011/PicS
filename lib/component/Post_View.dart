@@ -58,7 +58,13 @@ class _PostViewState extends State<PostView> {
                 children: [
                   ListTile(
                     dense: true,
-                    leading: CircleIcon(url: widget.iconURL),
+                    leading: InkWell(
+                      child: CircleIcon(url: widget.iconURL),
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, "profile/" + widget.username);
+                      },
+                    ),
                     title: FutureBuilder(
                       future: userAgent.getDisplayName(widget.username),
                       builder: (BuildContext context,

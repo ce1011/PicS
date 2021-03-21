@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../../component/Circle_Icon.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
@@ -6,46 +8,64 @@ import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_1.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import '../../provider/LoginStateNotifier.dart';
+import 'package:provider/provider.dart';
 
 import 'dart:typed_data';
 
 class ChatPage extends StatefulWidget {
-  String uid;
+  String uid, displayName, chatDocumentID;
 
-  ChatPage({Key key, @required this.uid}) : super(key: key);
+  ChatPage(
+      {Key key,
+      @required this.uid,
+      @required this.displayName,
+      @required this.chatDocumentID})
+      : super(key: key);
 
   @override
   _ChatPageState createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  List<int> test = [1, 1, 1, 1, 1, 1, 11, 1, 1, 1, 1, 11, 1, 1, 1, 1, 1];
+  List<int> test = [1, 1, 1, 1];
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   firebase_storage.FirebaseStorage storageInstance =
       firebase_storage.FirebaseStorage.instance;
 
-  QueryDocumentSnapshot chatContentList;
+  List<QueryDocumentSnapshot> chatContentList;
+
+  TextEditingController chatTextController = new TextEditingController();
 
   @override
   void initState() {
     super.initState();
-
+    print("chatroom/" + widget.chatDocumentID + "/chatContent");
     getChatContent();
   }
 
-  Future<QuerySnapshot> getChatContent() async {
-    CollectionReference post = firestoreInstance.collection("post");
-    post
-        .where('__name__', isGreaterThanOrEqualTo: "1")
-        .get()
-        .then((data) => print(data.docs[0].data().toString()));
+  Future<void> getChatContent() async {
+    CollectionReference chatContentCollection = firestoreInstance
+        .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
 
-    CollectionReference comment =
-        firestoreInstance.collection("post/1/comment");
-    return comment.get();
+    List<QueryDocumentSnapshot> chatContent;
+    chatContentCollection
+        .orderBy("sendAt", descending: true)
+        .get()
+        .then((data) => chatContentList = data.docs);
   }
 
-  Future<void> sendTextMessage(String text) {}
+  Future<void> sendTextMessage(String text) {
+    CollectionReference chatContentCollection = firestoreInstance
+        .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
+
+    chatContentCollection.add({
+      'content': chatTextController.text,
+      'contentType': 0,
+      'sendAt': new Timestamp.now(),
+      'sendBy': Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+    });
+  }
 
   Future<void> sendPhotoMessage(Uint8List photo) {}
 
@@ -63,7 +83,7 @@ class _ChatPageState extends State<ChatPage> {
           title: Row(children: [
             CircleIcon(url: "https://i.imgur.com/BoN9kdC.png"),
             Container(padding: EdgeInsets.only(left: 15)),
-            Text(widget.uid)
+            Text(widget.displayName)
           ]),
           actions: [
             IconButton(
@@ -89,10 +109,64 @@ class _ChatPageState extends State<ChatPage> {
               Expanded(
                   flex: 9,
                   child: SingleChildScrollView(
-                    child: Column(
-                      children: [for (var i in test) TestBubble(context)],
-                    ),
-                  )),
+                      child: StreamBuilder<QuerySnapshot>(
+                          stream: firestoreInstance
+                              .collection("chatroom/" +
+                                  widget.chatDocumentID +
+                                  "/chatContent")
+                              .orderBy('sendAt')
+                              .limitToLast(15)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            return snapshot.hasData
+                                ? Column(
+                                    children: [
+                                      for (var i in snapshot.data.docs)
+                                        ChatBubble(
+                                          clipper: (i.data()['sendBy'] ==
+                                                  Provider.of<LoginStateNotifier>(
+                                                          context,
+                                                          listen: false)
+                                                      .getUID())
+                                              ? ChatBubbleClipper1(
+                                                  type: BubbleType.sendBubble)
+                                              : ChatBubbleClipper1(
+                                                  type: BubbleType
+                                                      .receiverBubble),
+                                          alignment: (i.data()['sendBy'] ==
+                                                  Provider.of<LoginStateNotifier>(
+                                                          context,
+                                                          listen: false)
+                                                      .getUID())
+                                              ? Alignment.topRight
+                                              : Alignment.topLeft,
+                                          margin: EdgeInsets.only(top: 20),
+                                          backGroundColor: (i
+                                                      .data()['sendBy'] ==
+                                                  Provider.of<LoginStateNotifier>(
+                                                          context,
+                                                          listen: false)
+                                                      .getUID())
+                                              ? Colors.blue
+                                              : Colors.purple,
+                                          child: Container(
+                                            constraints: BoxConstraints(
+                                              maxWidth: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7,
+                                            ),
+                                            child: Text(
+                                              i.data()['content'],
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        )
+                                    ],
+                                  )
+                                : Container();
+                          }))),
               Divider(
                 thickness: 3.0,
                 color: Colors.greenAccent[400],
@@ -105,12 +179,15 @@ class _ChatPageState extends State<ChatPage> {
                         Expanded(
                             flex: 8,
                             child: TextField(
+                              controller: chatTextController,
                               maxLines: 999,
                             )),
                         Expanded(
                             child: IconButton(
                           icon: Icon(Icons.send),
-                          onPressed: () {},
+                          onPressed: () {
+                            sendTextMessage(chatTextController.text);
+                          },
                         ))
                       ],
                     ),

@@ -3,34 +3,26 @@ import '../../component/Circle_Icon.dart';
 import 'Chat_Page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../provider/LoginStateNotifier.dart';
+import 'package:provider/provider.dart';
+import '../../firebase/Firebase_User_Data_Agent.dart';
 
-class SelectChatPage extends StatefulWidget {
-  @override
-  _SelectChatPageState createState() => _SelectChatPageState();
-}
-
-class _SelectChatPageState extends State<SelectChatPage> {
+class SelectChatPage extends StatelessWidget {
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+  FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
 
-  QuerySnapshot chatList;
+  Future<List<QueryDocumentSnapshot>> getChatList(BuildContext context) async {
+    CollectionReference chatroom = firestoreInstance.collection("chatroom");
 
-  @override
-  void initState() {
-    super.initState();
-
-    getChatList();
-  }
-
-  Future<QuerySnapshot> getChatList() async {
-    CollectionReference post = firestoreInstance.collection("post");
-    post
-        .where('__name__', isGreaterThanOrEqualTo: "1")
+    List<QueryDocumentSnapshot> chatList;
+    await chatroom
+        .where('UID',
+            arrayContains:
+                Provider.of<LoginStateNotifier>(context, listen: true).getUID())
         .get()
-        .then((data) => print(data.docs[0].data().toString()));
+        .then((data) => chatList = data.docs);
 
-    CollectionReference comment =
-        firestoreInstance.collection("post/1/comment");
-    return comment.get();
+    return chatList;
   }
 
   @override
@@ -46,35 +38,70 @@ class _SelectChatPageState extends State<SelectChatPage> {
                   ? (MediaQuery.of(context).size.width) * 0.25
                   : (MediaQuery.of(context).size.width) * 0.0,
             ),
-            child: Column(
-              children: [
-                ListTile(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChatPage(
-                                uid: "test",
-                              )),
-                    );
-                  },
-                  dense: true,
-                  leading: CircleIcon(url: "https://i.imgur.com/BoN9kdC.png"),
-                  title: Text("Handsome"),
-                  subtitle: Text("I am handsome"),
-                ),
-                Divider(
-                  color: Colors.greenAccent[400],
-                ),
-                ListTile(
-                  dense: true,
-                  leading: CircleIcon(
-                      url:
-                          "https://startupbeat.hkej.com/wp-content/uploads/2016/05/Instagram-ICON-13MAY-768x769.png"),
-                  title: Text("Not handsome"),
-                  subtitle: Text("You are not handsome"),
-                ),
-              ],
-            )));
+            child: FutureBuilder(
+                future: getChatList(context),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) {
+                      return Text("Error");
+                    } else {
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            for (var i in snapshot.data)
+                              FutureBuilder(
+                                  future: (i.data()['UID'][0] ==
+                                          Provider.of<LoginStateNotifier>(
+                                                  context,
+                                                  listen: false)
+                                              .getUID())
+                                      ? firebaseUserDataAgent
+                                          .getDisplayName(i.data()['UID'][1])
+                                      : firebaseUserDataAgent
+                                          .getDisplayName(i.data()['UID'][0]),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<String>
+                                          snapshotDisplayName) {
+                                    if (snapshotDisplayName.connectionState ==
+                                        ConnectionState.done) {
+                                      if (snapshotDisplayName.hasError) {
+                                        return Text("Error");
+                                      } else {
+                                        return ListTile(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      ChatPage(
+                                                        uid: i.id,
+                                                        displayName:
+                                                            snapshotDisplayName
+                                                                .data,
+                                                                chatDocumentID: i.id ,
+                                                      )),
+                                            );
+                                          },
+                                          dense: true,
+                                          leading: CircleIcon(
+                                              url:
+                                                  "https://i.imgur.com/BoN9kdC.png"),
+                                          title: Text(snapshotDisplayName.data),
+                                          subtitle: Text("I am handsome"),
+                                        );
+                                      }
+                                    } else {
+                                      return Container();
+                                    }
+                                  })
+                          ],
+                        ),
+                      );
+                    }
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                })));
   }
 }
