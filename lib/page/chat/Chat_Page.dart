@@ -10,6 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'dart:typed_data';
 
@@ -28,7 +30,10 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  List<int> test = [1, 1, 1, 1];
+  Uint8List _image;
+  File _file;
+  int lastIndex;
+
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   firebase_storage.FirebaseStorage storageInstance =
       firebase_storage.FirebaseStorage.instance;
@@ -37,37 +42,49 @@ class _ChatPageState extends State<ChatPage> {
 
   TextEditingController chatTextController = new TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    print("chatroom/" + widget.chatDocumentID + "/chatContent");
-    getChatContent();
-  }
-
-  Future<void> getChatContent() async {
-    CollectionReference chatContentCollection = firestoreInstance
-        .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
-
-    List<QueryDocumentSnapshot> chatContent;
-    chatContentCollection
-        .orderBy("sendAt", descending: true)
-        .get()
-        .then((data) => chatContentList = data.docs);
-  }
-
   Future<void> sendTextMessage(String text) {
     CollectionReference chatContentCollection = firestoreInstance
         .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
 
     chatContentCollection.add({
+      'chatContentID': lastIndex + 1,
       'content': chatTextController.text,
       'contentType': 0,
       'sendAt': new Timestamp.now(),
       'sendBy': Provider.of<LoginStateNotifier>(context, listen: false).getUID()
-    });
+    }).then((value) => chatTextController.text = "");
   }
 
-  Future<void> sendPhotoMessage(Uint8List photo) {}
+  Future<void> sendPhotoMessage(Uint8List photo) async {
+    int temp_lastIndex;
+    if (lastIndex == null) {
+      temp_lastIndex = -1;
+    } else {
+      temp_lastIndex = lastIndex;
+    }
+
+    CollectionReference chatContentCollection = firestoreInstance
+        .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
+
+    try {
+      await storageInstance
+          .ref('chat/' +
+              widget.chatDocumentID +
+              '/' +
+              (temp_lastIndex + 1).toString() +
+              '.jpg')
+          .putData(photo);
+      await chatContentCollection.add({
+        'chatContentID': temp_lastIndex + 1,
+        'contentType': 1,
+        'sendAt': new Timestamp.now(),
+        'sendBy':
+            Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+      });
+    } on FirebaseException catch (e) {
+      print("Error");
+    }
+  }
 
   Future<void> sendVoiceMessage(String voicePath) {}
 
@@ -75,6 +92,39 @@ class _ChatPageState extends State<ChatPage> {
 
   void chatListPush(int type,
       {String text, Uint8List photo, String voicePath, Uint8List file}) {}
+
+  Widget chatBubbleContent(int type, {String content, int chatContentID}) {
+    switch (type) {
+      case 0:
+        {
+          return Text(content);
+        }
+      case 1:
+        {
+          return FutureBuilder(
+              future: getChatImageURL(chatContentID),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Image.network(snapshot.data);
+                } else {
+                  return Container();
+                }
+              });
+        }
+    }
+  }
+
+  Future<String> getChatImageURL(int chatContentID) async {
+    String url;
+    url = await storageInstance
+        .ref('chat/' +
+            widget.chatDocumentID +
+            '/' +
+            chatContentID.toString() +
+            '.jpg')
+        .getDownloadURL();
+    return url;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,58 +168,56 @@ class _ChatPageState extends State<ChatPage> {
                               .limitToLast(15)
                               .snapshots(),
                           builder: (context, snapshot) {
+                            lastIndex =
+                                snapshot.data.docs.last.data()['chatContentID'];
                             return snapshot.hasData
                                 ? Column(
                                     children: [
                                       for (var i in snapshot.data.docs)
                                         ChatBubble(
-                                          clipper: (i.data()['sendBy'] ==
-                                                  Provider.of<LoginStateNotifier>(
-                                                          context,
-                                                          listen: false)
-                                                      .getUID())
-                                              ? ChatBubbleClipper1(
-                                                  type: BubbleType.sendBubble)
-                                              : ChatBubbleClipper1(
-                                                  type: BubbleType
-                                                      .receiverBubble),
-                                          alignment: (i.data()['sendBy'] ==
-                                                  Provider.of<LoginStateNotifier>(
-                                                          context,
-                                                          listen: false)
-                                                      .getUID())
-                                              ? Alignment.topRight
-                                              : Alignment.topLeft,
-                                          margin: EdgeInsets.only(top: 20),
-                                          backGroundColor: (i
-                                                      .data()['sendBy'] ==
-                                                  Provider.of<LoginStateNotifier>(
-                                                          context,
-                                                          listen: false)
-                                                      .getUID())
-                                              ? Colors.blue
-                                              : Colors.purple,
-                                          child: Container(
-                                            constraints: BoxConstraints(
-                                              maxWidth: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.7,
-                                            ),
-                                            child: Text(
-                                              i.data()['content'],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        )
+                                            clipper: (i.data()['sendBy'] ==
+                                                    Provider.of<LoginStateNotifier>(context, listen: false)
+                                                        .getUID())
+                                                ? ChatBubbleClipper1(
+                                                    type: BubbleType.sendBubble)
+                                                : ChatBubbleClipper1(
+                                                    type: BubbleType
+                                                        .receiverBubble),
+                                            alignment: (i.data()['sendBy'] ==
+                                                    Provider.of<LoginStateNotifier>(
+                                                            context,
+                                                            listen: false)
+                                                        .getUID())
+                                                ? Alignment.topRight
+                                                : Alignment.topLeft,
+                                            margin: EdgeInsets.only(top: 20),
+                                            backGroundColor: (i.data()['sendBy'] ==
+                                                    Provider.of<LoginStateNotifier>(
+                                                            context,
+                                                            listen: false)
+                                                        .getUID())
+                                                ? Colors.blue
+                                                : Colors.purple,
+                                            child: Container(
+                                              constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7,
+                                              ),
+                                              child: chatBubbleContent(
+                                                i.data()['contentType'],
+                                                content: i.data()['content'],
+                                                chatContentID:
+                                                    i.data()['chatContentID'],
+                                              ),
+                                            )),
                                     ],
                                   )
                                 : Container();
                           }))),
               Divider(
                 thickness: 3.0,
-                color: Colors.greenAccent[400],
               ),
               Expanded(
                   flex: 1,
@@ -183,6 +231,49 @@ class _ChatPageState extends State<ChatPage> {
                               maxLines: 999,
                             )),
                         Expanded(
+                            child: PopupMenuButton(
+                          icon: Icon(Icons.attach_file),
+                          itemBuilder: (context) {
+                            var messageType = List<PopupMenuEntry<Object>>();
+                            messageType.add(PopupMenuItem(
+                              child: Text("Photo/Video"),
+                              value: 1,
+                            ));
+                            messageType.add(PopupMenuItem(
+                              child: Text("File"),
+                              value: 2,
+                            ));
+                            return messageType;
+                          },
+                          onSelected: (value) async {
+                            switch (value) {
+                              case 1:
+                                {
+                                  print("ok");
+                                  FilePickerResult result =
+                                      await FilePicker.platform.pickFiles(
+                                          type: FileType.image, withData: true);
+
+                                  setState(() {
+                                    if (result != null) {
+                                      PlatformFile file = result.files.first;
+                                      sendPhotoMessage(file.bytes);
+                                    } else {
+                                      print('No image selected.');
+                                    }
+                                  });
+
+                                  break;
+                                }
+
+                              case 2:
+                                {
+                                  print("ok2");
+                                }
+                            }
+                          },
+                        )),
+                        Expanded(
                             child: IconButton(
                           icon: Icon(Icons.send),
                           onPressed: () {
@@ -195,53 +286,3 @@ class _ChatPageState extends State<ChatPage> {
             ])));
   }
 }
-
-Widget TestBubble(BuildContext context) {
-  return Column(
-    children: [
-      ChatBubble(
-        clipper: ChatBubbleClipper1(type: BubbleType.sendBubble),
-        alignment: Alignment.topRight,
-        margin: EdgeInsets.only(top: 20),
-        backGroundColor: Colors.blue,
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.7,
-          ),
-          child: Text(
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-      ChatBubble(
-        clipper: ChatBubbleClipper1(type: BubbleType.receiverBubble),
-        backGroundColor: Color(0xffE7E7ED),
-        margin: EdgeInsets.only(top: 20),
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.7,
-          ),
-          child: Text(
-            "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat",
-            style: TextStyle(color: Colors.black),
-          ),
-        ),
-      )
-    ],
-  );
-}
-
-/*
-Row(children: [
-CircleIcon(url: "https://i.imgur.com/BoN9kdC.png"),
-Text(" Dick")
-])*/
-
-/*
-Row(children: [
-            CircleIcon(url: "https://i.imgur.com/BoN9kdC.png"),
-            Container(padding: EdgeInsets.only(left: 15)),
-            Text("Dick")
-          ])
-*/
