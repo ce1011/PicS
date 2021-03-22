@@ -11,7 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:link/link.dart';
 
 import 'dart:typed_data';
 
@@ -65,7 +65,11 @@ class _ChatPageState extends State<ChatPage> {
 
     CollectionReference chatContentCollection = firestoreInstance
         .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
-
+  print('chat/' +
+      widget.chatDocumentID +
+      '/' +
+      (temp_lastIndex + 1).toString() +
+      '.jpg');
     try {
       await storageInstance
           .ref('chat/' +
@@ -88,7 +92,33 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> sendVoiceMessage(String voicePath) {}
 
-  Future<void> sendFileMessage(Uint8List file) {}
+  Future<void> sendFileMessage(Uint8List file, String filename) async {
+    int temp_lastIndex;
+    if (lastIndex == null) {
+      temp_lastIndex = -1;
+    } else {
+      temp_lastIndex = lastIndex;
+    }
+
+    CollectionReference chatContentCollection = firestoreInstance
+        .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
+
+    try {
+      await storageInstance
+          .ref('chat/' + widget.chatDocumentID + '/' + filename)
+          .putData(file);
+      await chatContentCollection.add({
+        'chatContentID': temp_lastIndex + 1,
+        'contentType': 2,
+        'content': filename,
+        'sendAt': new Timestamp.now(),
+        'sendBy':
+            Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+      });
+    } on FirebaseException catch (e) {
+      print("Error");
+    }
+  }
 
   void chatListPush(int type,
       {String text, Uint8List photo, String voicePath, Uint8List file}) {}
@@ -111,6 +141,21 @@ class _ChatPageState extends State<ChatPage> {
                 }
               });
         }
+      case 2:
+        {
+          return FutureBuilder(
+              future: getChatFileURL(content),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Link(
+                    child: Text(snapshot.data),
+                    url: snapshot.data,
+                  );
+                } else {
+                  return Container();
+                }
+              });
+        }
     }
   }
 
@@ -122,6 +167,14 @@ class _ChatPageState extends State<ChatPage> {
             '/' +
             chatContentID.toString() +
             '.jpg')
+        .getDownloadURL();
+    return url;
+  }
+
+  Future<String> getChatFileURL(String filename) async {
+    String url;
+    url = await storageInstance
+        .ref('chat/' + widget.chatDocumentID + '/' + filename)
         .getDownloadURL();
     return url;
   }
@@ -268,7 +321,20 @@ class _ChatPageState extends State<ChatPage> {
 
                               case 2:
                                 {
-                                  print("ok2");
+                                  FilePickerResult result =
+                                      await FilePicker.platform.pickFiles(
+                                          type: FileType.any, withData: true);
+
+                                  setState(() {
+                                    if (result != null) {
+                                      PlatformFile file = result.files.first;
+                                      sendFileMessage(file.bytes, file.name);
+                                    } else {
+                                      print('No image selected.');
+                                    }
+                                  });
+
+                                  break;
                                 }
                             }
                           },
