@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../component/Circle_Icon.dart';
 import 'package:flutter_chat_bubble/bubble_type.dart';
@@ -392,7 +393,7 @@ class _ChatPageState extends State<ChatPage> {
                               controller: chatTextController,
                               maxLines: 999,
                             )),
-                        GestureDetector(
+                        !kIsWeb? GestureDetector(
                             onLongPress: () async {
                               await _myRecorder.startRecorder(
                                 toFile: voiceFile,
@@ -410,7 +411,7 @@ class _ChatPageState extends State<ChatPage> {
                             child: Expanded(
                               child:
                                   InkWell(child: Icon(Icons.record_voice_over)),
-                            )),
+                            )): Container(),
                         Expanded(
                             child: PopupMenuButton(
                           icon: Icon(Icons.attach_file),
