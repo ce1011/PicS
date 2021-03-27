@@ -12,6 +12,8 @@ import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:link/link.dart';
+import 'package:flutter_sound/flutter_sound.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'dart:typed_data';
 
@@ -33,6 +35,13 @@ class _ChatPageState extends State<ChatPage> {
   Uint8List _image;
   File _file;
   int lastIndex;
+  String voiceFile = "temp.aac";
+
+  FlutterSoundPlayer _myPlayer = FlutterSoundPlayer();
+  FlutterSoundRecorder _myRecorder = FlutterSoundRecorder();
+
+  bool _myPlayerInit = false;
+  bool _myRecorderInit = false;
 
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   firebase_storage.FirebaseStorage storageInstance =
@@ -43,8 +52,15 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController chatTextController = new TextEditingController();
 
   Future<void> sendTextMessage(String text) {
+    int temp_lastIndex;
     CollectionReference chatContentCollection = firestoreInstance
         .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
+
+    if (lastIndex == null) {
+      temp_lastIndex = -1;
+    } else {
+      temp_lastIndex = lastIndex;
+    }
 
     chatContentCollection.add({
       'chatContentID': lastIndex + 1,
@@ -65,11 +81,11 @@ class _ChatPageState extends State<ChatPage> {
 
     CollectionReference chatContentCollection = firestoreInstance
         .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
-  print('chat/' +
-      widget.chatDocumentID +
-      '/' +
-      (temp_lastIndex + 1).toString() +
-      '.jpg');
+    print('chat/' +
+        widget.chatDocumentID +
+        '/' +
+        (temp_lastIndex + 1).toString() +
+        '.jpg');
     try {
       await storageInstance
           .ref('chat/' +
@@ -90,7 +106,38 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
-  Future<void> sendVoiceMessage(String voicePath) {}
+  Future<void> sendVoiceMessage(String voicePath) async {
+    File file = File(voicePath);
+
+    int temp_lastIndex;
+    if (lastIndex == null) {
+      temp_lastIndex = -1;
+    } else {
+      temp_lastIndex = lastIndex;
+    }
+
+    CollectionReference chatContentCollection = firestoreInstance
+        .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
+
+    try {
+      await storageInstance
+          .ref('chat/' +
+              widget.chatDocumentID +
+              '/' +
+              (temp_lastIndex + 1).toString() +
+              '.aac')
+          .putFile(file);
+      await chatContentCollection.add({
+        'chatContentID': temp_lastIndex + 1,
+        'contentType': 3,
+        'sendAt': new Timestamp.now(),
+        'sendBy':
+            Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+      });
+    } on FirebaseException catch (e) {
+      print("Error");
+    }
+  }
 
   Future<void> sendFileMessage(Uint8List file, String filename) async {
     int temp_lastIndex;
@@ -105,7 +152,12 @@ class _ChatPageState extends State<ChatPage> {
 
     try {
       await storageInstance
-          .ref('chat/' + widget.chatDocumentID + '/' + filename)
+          .ref('chat/' +
+              widget.chatDocumentID +
+              '/' +
+              (temp_lastIndex + 1).toString() +
+              '/' +
+              filename)
           .putData(file);
       await chatContentCollection.add({
         'chatContentID': temp_lastIndex + 1,
@@ -119,9 +171,6 @@ class _ChatPageState extends State<ChatPage> {
       print("Error");
     }
   }
-
-  void chatListPush(int type,
-      {String text, Uint8List photo, String voicePath, Uint8List file}) {}
 
   Widget chatBubbleContent(int type, {String content, int chatContentID}) {
     switch (type) {
@@ -144,12 +193,29 @@ class _ChatPageState extends State<ChatPage> {
       case 2:
         {
           return FutureBuilder(
-              future: getChatFileURL(content),
+              future: getChatFileURL(content, chatContentID),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Link(
                     child: Text(snapshot.data),
                     url: snapshot.data,
+                  );
+                } else {
+                  return Container();
+                }
+              });
+        }
+      case 3:
+        {
+          return FutureBuilder(
+              future: getChatAudioURL(chatContentID),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return SoundPlayerUI.fromTrack(
+                    Track(
+                      trackPath: snapshot.data,
+                      codec: Codec.aacADTS,
+                    ),
                   );
                 } else {
                   return Container();
@@ -171,12 +237,55 @@ class _ChatPageState extends State<ChatPage> {
     return url;
   }
 
-  Future<String> getChatFileURL(String filename) async {
+  Future<String> getChatFileURL(String filename, int chatContentID) async {
     String url;
     url = await storageInstance
-        .ref('chat/' + widget.chatDocumentID + '/' + filename)
+        .ref('chat/' +
+            widget.chatDocumentID +
+            '/' +
+            chatContentID.toString() +
+            '/' +
+            filename)
         .getDownloadURL();
     return url;
+  }
+
+  Future<String> getChatAudioURL(int chatContentID) async {
+    String url;
+    url = await storageInstance
+        .ref('chat/' +
+            widget.chatDocumentID +
+            '/' +
+            chatContentID.toString() +
+            '.aac')
+        .getDownloadURL();
+    return url;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Be careful : openAudioSession return a Future.
+    // Do not access your FlutterSoundPlayer or FlutterSoundRecorder before the completion of the Future
+    _myPlayer.openAudioSession().then((value) {
+      setState(() {
+        _myPlayerInit = true;
+      });
+    });
+
+    _myRecorder.openAudioSession().then((value) {
+      setState(() {
+        _myRecorderInit = true;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    // Be careful : you must `close` the audio session when you have finished with it.
+    _myRecorder.closeAudioSession();
+    _myRecorder = null;
+    super.dispose();
   }
 
   @override
@@ -282,6 +391,25 @@ class _ChatPageState extends State<ChatPage> {
                             child: TextField(
                               controller: chatTextController,
                               maxLines: 999,
+                            )),
+                        GestureDetector(
+                            onLongPress: () async {
+                              await _myRecorder.startRecorder(
+                                toFile: voiceFile,
+                                codec: Codec.aacADTS,
+                              );
+                              print("Long");
+                            },
+                            onLongPressUp: () async {
+                              await _myRecorder.stopRecorder();
+
+                              _myRecorder
+                                  .getRecordURL(path: "temp.aac")
+                                  .then((value) => sendVoiceMessage(value));
+                            },
+                            child: Expanded(
+                              child:
+                                  InkWell(child: Icon(Icons.record_voice_over)),
                             )),
                         Expanded(
                             child: PopupMenuButton(

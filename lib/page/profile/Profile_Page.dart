@@ -8,11 +8,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
 import '../../component/Post_View.dart';
 import '../profile/Profile_Edit_Page.dart';
+import '../chat/Chat_Page.dart';
 
 class ProfilePage extends StatelessWidget {
   String UID;
 
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
+
+  FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
 
   ProfilePage({Key key, @required this.UID}) : super(key: key);
 
@@ -94,7 +97,64 @@ class ProfilePage extends StatelessWidget {
                                                 ProfileEditPage()));
                                   },
                                   child: Text("Edit profile"))
-                              : Container()
+                              : RaisedButton(
+                                  onPressed: () async {
+                                    CollectionReference chatroom =
+                                        firestoreInstance
+                                            .collection("chatroom");
+
+                                    int chatRoomFound = 0;
+
+                                    List<QueryDocumentSnapshot> data;
+
+                                    await chatroom
+                                        .where(
+                                            'UID.' +
+                                                Provider.of<LoginStateNotifier>(
+                                                        context,
+                                                        listen: false)
+                                                    .getUID(),
+                                            isEqualTo: true)
+                                        .get()
+                                        .then((value) => data = value.docs);
+
+                                    chatRoomFound = data.length;
+
+                                    if (chatRoomFound == 0) {
+                                      chatroom.add({
+                                        'UID': {
+                                          Provider.of<LoginStateNotifier>(
+                                                  context,
+                                                  listen: false)
+                                              .getUID(): true,
+                                          UID: true
+                                        }
+                                      }).then((value) =>
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => ChatPage(
+                                                      uid: UID,
+                                                      displayName:
+                                                      snapshot.data.data()['displayName'],
+                                                      chatDocumentID: value.id,
+                                                    )),
+                                          ));
+                                    } else {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => ChatPage(
+                                                  uid: UID,
+                                                  displayName:
+                                                  snapshot.data.data()['displayName'],
+                                                  chatDocumentID: data[0].id,
+                                                )),
+                                      );
+                                    }
+                                  },
+                                  child: Text("Chat"),
+                                )
                         ],
                       ));
                 } else {

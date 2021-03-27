@@ -19,14 +19,6 @@ class _HomePageState extends State<HomePage> {
   int selectedHomePage = 0;
   List<Widget> widgetList = <Widget>[HomePagePost(), HomePageProfile()];
 
-  /*
-  List<Widget> widgetList = <Widget>[
-    HomePagePost(),
-    HomePageSearch(),
-    HomePageProfile()
-  ];
-  */
-
   void onTap(int index) {
     setState(() {
       selectedHomePage = index;

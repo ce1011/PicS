@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
+import 'Create_New_Chat.dart';
 
 class SelectChatPage extends StatelessWidget {
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
@@ -16,9 +17,8 @@ class SelectChatPage extends StatelessWidget {
 
     List<QueryDocumentSnapshot> chatList;
     await chatroom
-        .where('UID',
-            arrayContains:
-                Provider.of<LoginStateNotifier>(context, listen: true).getUID())
+        .where('UID.' + Provider.of<LoginStateNotifier>(context, listen: true).getUID(), isEqualTo: true
+)
         .get()
         .then((data) => chatList = data.docs);
 
@@ -28,7 +28,16 @@ class SelectChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("Chat")),
+        appBar: AppBar(title: Text("Chat"),        actions: [
+          IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CreateNewChatPage()),);
+              })
+        ],),
+
         body: Container(
             padding: EdgeInsets.only(
               left: (MediaQuery.of(context).size.width >= 1080.0)

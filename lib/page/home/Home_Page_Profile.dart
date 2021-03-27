@@ -69,8 +69,7 @@ class HomePageProfile extends StatelessWidget {
             ListTile(
                 subtitle: Text(
                     Provider.of<LoginStateNotifier>(context, listen: true)
-                        .getDescription())),
-            RaisedButton(
+                        .getDescription())), RaisedButton(
                 onPressed: () {
                   Navigator.push(
                       context,
@@ -103,8 +102,7 @@ class HomePageProfile extends StatelessWidget {
                                 for (var i in snapshot.data)
                                   PostView(
                                       username: i.data()['UID'],
-                                      iconURL:
-                                          "https://i.imgur.com/BoN9kdC.png",
+                                      iconURL: "https://i.imgur.com/BoN9kdC.png",
                                       postDate: i.data()['postTime'],
                                       postID: i.data()['postID'].toString(),
                                       description: i.data()['description']),
