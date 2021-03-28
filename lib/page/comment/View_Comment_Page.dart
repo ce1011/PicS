@@ -12,7 +12,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class ViewCommentPage extends StatelessWidget {
-  String postID, imageURL;
+  String postID, imageURL, postCreatorUID;
 
   ViewCommentPage({Key key, @required this.postID}) : super(key: key);
 
@@ -22,9 +22,11 @@ class ViewCommentPage extends StatelessWidget {
   firebase_storage.FirebaseStorage _storageInstance =
       firebase_storage.FirebaseStorage.instance;
 
+
+
   Future<List<QueryDocumentSnapshot>> getCommentData() async {
     String url, postDocumentName;
-    List<QueryDocumentSnapshot> commentList;
+    List<QueryDocumentSnapshot> commentList, postData;
     url =
         await _storageInstance.ref('/post/' + postID + '.jpg').getDownloadURL();
 
@@ -35,10 +37,10 @@ class ViewCommentPage extends StatelessWidget {
     CollectionReference post = firestoreInstance.collection("post");
 
     await post
-        .where("postID", isEqualTo: int.parse(postID))
+        .where("__name__", isEqualTo: postID)
         .get()
-        .then((data) => {postDocumentName = data.docs[0].id});
-    print("post/" + postDocumentName + "/comment");
+        .then((data) => {postDocumentName = data.docs[0].id, postCreatorUID = data.docs[0]['UID']});
+    print(postCreatorUID);
     await firestoreInstance
         .collection("post/" + postDocumentName + "/comment")
     .orderBy("commentID")
@@ -101,6 +103,9 @@ class ViewCommentPage extends StatelessWidget {
                         EndX: i.data()['endX'],
                         EndY: i.data()['endY'],
                         description: i.data()['content'],
+                        postCreatorUID: postCreatorUID,
+                        commentID: i.id,
+                        postID: postID,
                       )),
               ]);
             }

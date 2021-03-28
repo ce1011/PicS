@@ -7,6 +7,7 @@ import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
 import 'Create_New_Chat.dart';
+import 'dart:convert';
 
 class SelectChatPage extends StatelessWidget {
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
@@ -17,8 +18,10 @@ class SelectChatPage extends StatelessWidget {
 
     List<QueryDocumentSnapshot> chatList;
     await chatroom
-        .where('UID.' + Provider.of<LoginStateNotifier>(context, listen: true).getUID(), isEqualTo: true
-)
+        .where(
+            'UID.' +
+                Provider.of<LoginStateNotifier>(context, listen: true).getUID(),
+            isEqualTo: true)
         .get()
         .then((data) => chatList = data.docs);
 
@@ -28,16 +31,20 @@ class SelectChatPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("Chat"),        actions: [
-          IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {
-                Navigator.push(
+        appBar: AppBar(
+          title: Text("Chat"),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CreateNewChatPage()),);
-              })
-        ],),
-
+                    MaterialPageRoute(
+                        builder: (context) => CreateNewChatPage()),
+                  );
+                })
+          ],
+        ),
         body: Container(
             padding: EdgeInsets.only(
               left: (MediaQuery.of(context).size.width >= 1080.0)
@@ -60,15 +67,22 @@ class SelectChatPage extends StatelessWidget {
                           children: [
                             for (var i in snapshot.data)
                               FutureBuilder(
-                                  future: (i.data()['UID'][0] ==
+                                  future: (firebaseUserDataAgent.getDisplayName(i
+                                      .data()['UID']
+                                      .toString()
+                                      .substring(1, 29)) ==
                                           Provider.of<LoginStateNotifier>(
                                                   context,
                                                   listen: false)
                                               .getUID())
-                                      ? firebaseUserDataAgent
-                                          .getDisplayName(i.data()['UID'][1])
-                                      : firebaseUserDataAgent
-                                          .getDisplayName(i.data()['UID'][0]),
+                                      ? firebaseUserDataAgent.getDisplayName(i
+                                          .data()['UID']
+                                          .toString()
+                                          .substring(37, 65))
+                                      : firebaseUserDataAgent.getDisplayName(i
+                                          .data()['UID']
+                                          .toString()
+                                          .substring(1, 29)),
                                   builder: (BuildContext context,
                                       AsyncSnapshot<String>
                                           snapshotDisplayName) {
@@ -77,6 +91,14 @@ class SelectChatPage extends StatelessWidget {
                                       if (snapshotDisplayName.hasError) {
                                         return Text("Error");
                                       } else {
+                                        print(i
+                                            .data()['UID']
+                                            .toString()
+                                            .substring(1, 29));
+                                        print(i
+                                            .data()['UID']
+                                            .toString()
+                                            .substring(37, 65));
                                         return ListTile(
                                           onTap: () {
                                             Navigator.push(
@@ -88,16 +110,16 @@ class SelectChatPage extends StatelessWidget {
                                                         displayName:
                                                             snapshotDisplayName
                                                                 .data,
-                                                                chatDocumentID: i.id ,
+                                                        chatDocumentID: i.id,
                                                       )),
                                             );
                                           },
-                                          dense: true,
+                                          dense: false,
                                           leading: CircleIcon(
                                               url:
                                                   "https://i.imgur.com/BoN9kdC.png"),
                                           title: Text(snapshotDisplayName.data),
-                                          subtitle: Text("I am handsome"),
+                                          subtitle: Text(""),
                                         );
                                       }
                                     } else {

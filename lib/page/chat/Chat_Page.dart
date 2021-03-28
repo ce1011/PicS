@@ -64,7 +64,7 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     chatContentCollection.add({
-      'chatContentID': lastIndex + 1,
+      'chatContentID': temp_lastIndex + 1,
       'content': chatTextController.text,
       'contentType': 0,
       'sendAt': new Timestamp.now(),
@@ -393,25 +393,25 @@ class _ChatPageState extends State<ChatPage> {
                               controller: chatTextController,
                               maxLines: 999,
                             )),
-                        !kIsWeb? GestureDetector(
-                            onLongPress: () async {
-                              await _myRecorder.startRecorder(
-                                toFile: voiceFile,
-                                codec: Codec.aacADTS,
-                              );
-                              print("Long");
-                            },
-                            onLongPressUp: () async {
-                              await _myRecorder.stopRecorder();
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                              onLongPress: () async {
+                                await _myRecorder.startRecorder(
+                                  toFile: voiceFile,
+                                  codec: Codec.aacADTS,
+                                );
+                                print("Long");
+                              },
+                              onLongPressUp: () async {
+                                await _myRecorder.stopRecorder();
 
-                              _myRecorder
-                                  .getRecordURL(path: "temp.aac")
-                                  .then((value) => sendVoiceMessage(value));
-                            },
-                            child: Expanded(
-                              child:
-                                  InkWell(child: Icon(Icons.record_voice_over)),
-                            )): Container(),
+                                _myRecorder
+                                    .getRecordURL(path: "temp.aac")
+                                    .then((value) => sendVoiceMessage(value));
+                              },
+                              child: Icon(Icons.record_voice_over)),
+                        ),
                         Expanded(
                             child: PopupMenuButton(
                           icon: Icon(Icons.attach_file),

@@ -4,14 +4,17 @@ import 'Comment_Crop_Photo.dart';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../firebase/Firebase_User_Data_Agent.dart';
+import '../provider/LoginStateNotifier.dart';
+import 'package:provider/provider.dart';
 
 class CommentView extends StatefulWidget {
-  String username, iconURL, description;
+  String username, iconURL, description, postCreatorUID, commentID, postID;
   Timestamp commentDate;
   int StartX, StartY, EndX, EndY;
   Uint8List photoByte;
 
-  CommentView({@required username,@required String iconURL,@required Timestamp commentDate,@required Uint8List photoByte,@required int StartX,@required int StartY,@required int EndX,@required int EndY, @required String description}){
+  CommentView(
+      {@required username, @required String iconURL, @required Timestamp commentDate, @required Uint8List photoByte, @required int StartX, @required int StartY, @required int EndX, @required int EndY, @required String description, @required String postCreatorUID, @required String commentID, @required postID}) {
     this.username = username;
     this.iconURL = iconURL;
     this.commentDate = commentDate;
@@ -21,6 +24,9 @@ class CommentView extends StatefulWidget {
     this.StartY = StartY;
     this.EndX = EndX;
     this.EndY = EndY;
+    this.postCreatorUID = postCreatorUID;
+    this.commentID = commentID;
+    this.postID = postID;
   }
 
   @override
@@ -30,9 +36,11 @@ class CommentView extends StatefulWidget {
 class _CommentViewState extends State<CommentView> {
   FirebaseUserDataAgent userAgent = new FirebaseUserDataAgent();
 
+  bool deleted = false;
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return !deleted ? Column(
       children: [
         ListTile(
           dense: true,
@@ -58,7 +66,10 @@ class _CommentViewState extends State<CommentView> {
               }
             },
           ),
-          subtitle: Text("Comment at "+DateTime.fromMillisecondsSinceEpoch(widget.commentDate.millisecondsSinceEpoch).toLocal().toString().substring(0,19)),
+          subtitle: Text("Comment at " + DateTime.fromMillisecondsSinceEpoch(
+              widget.commentDate.millisecondsSinceEpoch).toLocal()
+              .toString()
+              .substring(0, 19)),
         ),
         Divider(
           color: Colors.greenAccent[400],
@@ -81,16 +92,60 @@ class _CommentViewState extends State<CommentView> {
         ),
         Container(
             child: Row(
-              children: [
-                IconButton(icon: Icon(Icons.favorite), onPressed: (){
+                children: [
+            ((widget.username ==
+            Provider.of<LoginStateNotifier>(context,
+                listen: false)
+                .getUID()) || (widget.postCreatorUID ==
+            Provider.of<LoginStateNotifier>(context,
+                listen: false).getUID()) ? IconButton(
+          icon: Icon(Icons.delete), onPressed: () {
+              CollectionReference post = FirebaseFirestore
+                  .instance
+                  .collection("post/" + widget.postID + "/comment");
 
-                },),
-                IconButton(icon: Icon(Icons.forward),onPressed: (){
+              final snackBar = SnackBar(
+                content: Text("Comment Deleted"),
+                behavior: SnackBarBehavior.floating,
+                duration: Duration(
+                    seconds: 1, milliseconds: 500),
+              );
 
-                }),
-              ],
-            ))
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text(
+                          "Are you sure to delete comment?"),
+                      content: Text(
+                          "This action is unrevertible"),
+                      actions: [
+                        TextButton(
+                          child: Text("Delete"),
+                          onPressed: () async {
+                            await post
+                                .doc(widget.commentID)
+                                .delete()
+                                .then((value) =>
+                                ScaffoldMessenger.of(
+                                    context)
+                                    .showSnackBar(
+                                    snackBar));
+
+                            setState(() {
+                              deleted = true;
+                            });
+
+                            Navigator.of(context).pop();
+                          },
+                        )
+                      ],
+                    );
+                  });
+            },) : Container()),
       ],
-    );
+    ))]
+    ,
+    ): Container();
   }
 }

@@ -14,7 +14,7 @@ class HomePagePost extends StatelessWidget {
     List<QueryDocumentSnapshot> postList;
     CollectionReference post = firestoreInstance.collection("post");
     await post
-        .orderBy("postID")
+        .orderBy("postTime", descending: true)
         .get()
         .then((data) => postList = data.docs);
     return postList;
@@ -39,7 +39,7 @@ class HomePagePost extends StatelessWidget {
                           username: i.data()['UID'],
                           iconURL: "https://i.imgur.com/BoN9kdC.png",
                           postDate: i.data()['postTime'],
-                          postID: i.data()['postID'].toString(),
+                          postID: i.id,
                           description: i.data()['description'])
                   ],
                 ),

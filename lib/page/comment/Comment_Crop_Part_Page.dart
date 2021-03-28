@@ -27,14 +27,9 @@ class CommentCropPartPage extends StatelessWidget {
     String postDocumentName;
     CollectionReference post = FirebaseFirestore.instance.collection("post");
 
-    await post
-        .where("postID", isEqualTo: int.parse(postID))
-        .get()
-        .then((data) => {postDocumentName = data.docs[0].id});
-
 
     CollectionReference comment =
-    FirebaseFirestore.instance.collection('/post/'+postDocumentName+'/comment');
+    FirebaseFirestore.instance.collection('/post/'+postID+'/comment');
 
     int lastIndex;
     bool success;
@@ -43,7 +38,12 @@ class CommentCropPartPage extends StatelessWidget {
         .orderBy('commentID', descending: true)
         .limit(1)
         .get();
-    lastIndex = lastComment.docs[0].data()['commentID'];
+    if(lastComment.docs.isEmpty){
+lastIndex = -1;
+    }else{
+      lastIndex = lastComment.docs[0].data()['commentID'];
+    }
+
     await comment
         .add({
       'commentID': lastIndex+1,

@@ -55,7 +55,17 @@ class FirebaseUserDataAgent {
     return displayName;
   }
 
-  Future<String> getUserPersonalDescription(String UID) {}
+  Future<String> getUserPersonalDescription(String UID) async {
+    String description;
+
+    await _fireStoreInstance
+        .where('UID', isEqualTo: UID)
+        .get()
+        .then((data) => description = data.docs[0].data()['description'])
+        .catchError((onError) => description = "Error");
+
+    return description;
+  }
 
   Future<QuerySnapshot> getUserCustomGroupList(String UID) {}
 }

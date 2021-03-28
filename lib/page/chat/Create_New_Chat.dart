@@ -20,7 +20,7 @@ class CreateNewChatPage extends StatelessWidget {
 
     int chatRoomFound = 0;
 
-    await firebaseUserDataAgent.getUIDByUsername("Rickson4406").then((value) =>
+    await firebaseUserDataAgent.getUIDByUsername(targetUsername.text).then((value) =>
     targetUID = value).then((value) =>
         firebaseUserDataAgent.getDisplayName(targetUID).then((value) =>
         targetDisplayName = value));
@@ -31,7 +31,7 @@ class CreateNewChatPage extends StatelessWidget {
         .where('UID.' +
         Provider.of<LoginStateNotifier>(context, listen: false).getUID(),
         isEqualTo: true
-    ).get().then((value) => data = value.docs);
+    ).where('UID.' + targetUID, isEqualTo: true).get().then((value) => data = value.docs);
 
     chatRoomFound = data.length;
 

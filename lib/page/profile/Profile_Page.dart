@@ -186,7 +186,7 @@ class ProfilePage extends StatelessWidget {
                                         iconURL:
                                             "https://i.imgur.com/BoN9kdC.png",
                                         postDate: i.data()['postTime'],
-                                        postID: i.data()['postID'].toString(),
+                                        postID: i.id,
                                         description: i.data()['description']),
                                 ],
                               ),
