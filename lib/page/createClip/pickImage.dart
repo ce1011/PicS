@@ -62,34 +62,48 @@ class _PickImagePageState extends State<PickImagePage> {
     return true;
   }
 
-  Future postClipToDatabase() async {
+  Future postClipToDatabase(BuildContext context) async {
     CollectionReference post = firestoreInstance.collection("post");
     CollectionReference groupDB = firestoreInstance.collection("groupDB");
 
     String postID;
 
-    await post.add({
+    var document = {
       'UID': Provider.of<LoginStateNotifier>(context, listen: false).getUID(),
       'description': description.text,
       'postTime': Timestamp.now(),
-      'permission': {
-        'ableToCommentForPublic': ableToCommentForPublic,
-        'visibleForPublic': visibleForPublic,
-        'ableToCommentFor': groupDB.doc(ableToCommentForPath.substring(8)),
-        'visibleFor': groupDB.doc(visiblePermissionPath.substring(8))
-      },
       'video': videoMode
-    }).then((value) => postID = value.id);
+    };
+
+    var permission = {};
+    permission['ableToCommentForPublic'] =ableToCommentForPublic;
+    permission['visibleForPublic'] =visibleForPublic;
+    if(ableToCommentForPublic == false){
+      permission['ableToCommentFor'] = groupDB.doc(ableToCommentForPath.substring(8));
+    }else{
+      permission['ableToCommentFor'] = null;
+    }
+    if(visibleForPublic == false){
+      permission['visibleFor'] = groupDB.doc(visiblePermissionPath.substring(8));
+    }else{
+      permission['visibleFor'] = null;
+    }
+    
+    document['permission'] = permission;
+
+    await post.add(document).then((value) => postID = value.id);
 
     if (videoMode == false) {
       try {
         await storageInstance.ref('post/' + postID + '.jpg').putData(_image);
+        Navigator.pop(context);
       } on FirebaseException catch (e) {
         print("Error");
       }
     } else {
       try {
         await storageInstance.ref('post/' + postID + '.mp4').putFile(videoPath);
+        Navigator.pop(context);
       } on FirebaseException catch (e) {
         print("Error");
       }
@@ -230,7 +244,7 @@ class _PickImagePageState extends State<PickImagePage> {
                   child: RaisedButton(
                 child: Text("Send"),
                 onPressed: () {
-                  postClipToDatabase();
+                  postClipToDatabase(context);
                 },
               ))
             ],

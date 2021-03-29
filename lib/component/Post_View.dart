@@ -71,6 +71,13 @@ class _PostViewState extends State<PostView> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _videoController.dispose();
+    super.dispose();
+  }
+
 
 
   Future<void> deleteConfirm() async {}
