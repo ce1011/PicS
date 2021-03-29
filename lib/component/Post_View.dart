@@ -6,22 +6,26 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../firebase/Firebase_User_Data_Agent.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
 
 class PostView extends StatefulWidget {
   String username, iconURL, postID, description;
   Timestamp postDate;
+  bool videoMode;
 
   PostView(
       {@required username,
       @required String iconURL,
       @required Timestamp postDate,
       @required String postID,
-      @required String description}) {
+      @required String description,
+      @required bool videoMode}) {
     this.username = username;
     this.iconURL = iconURL;
     this.postDate = postDate;
     this.postID = postID;
     this.description = description;
+    this.videoMode = videoMode;
   }
 
   @override
@@ -30,16 +34,34 @@ class PostView extends StatefulWidget {
 
 class _PostViewState extends State<PostView> {
   FirebaseUserDataAgent userAgent = new FirebaseUserDataAgent();
-
   bool deleted = false;
+  VideoPlayerController _videoController;
 
   firebase_storage.FirebaseStorage _storageInstance =
       firebase_storage.FirebaseStorage.instance;
+
+  Future<bool> loadVideo() async {
+    print("Start Initialize");
+    //await _videoController.setLooping(true);
+    await _videoController.initialize();
+    await     _videoController.setLooping(true);
+
+    return true;
+  }
 
   Future<String> getPostImageURL(String postID) async {
     String url;
     url =
         await _storageInstance.ref('/post/' + postID + '.jpg').getDownloadURL();
+    return url;
+  }
+
+  Future<String> getPostVideoURL(String postID) async {
+    String url;
+    url =
+    await _storageInstance.ref('/post/' + postID + '.mp4').getDownloadURL();
+
+    _videoController = VideoPlayerController.network(url);
     return url;
   }
 
@@ -49,13 +71,16 @@ class _PostViewState extends State<PostView> {
     super.initState();
   }
 
+
+
   Future<void> deleteConfirm() async {}
 
   @override
   Widget build(BuildContext context) {
+    print(widget.postID + " " + widget.videoMode.toString());
     return !deleted
         ? FutureBuilder(
-            future: getPostImageURL(widget.postID),
+            future: (widget.videoMode == false) ? getPostImageURL(widget.postID) : getPostVideoURL(widget.postID) ,
             builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 if (snapshot.hasError) {
@@ -96,7 +121,19 @@ class _PostViewState extends State<PostView> {
                                 .substring(0, 19)),
                       ),
                       Divider(),
-                      Container(child: Image.network(snapshot.data)),
+                      Container(child:  (widget.videoMode == false) ? Image.network(snapshot.data) : FutureBuilder(
+                          future: loadVideo(),
+                          builder: (builder, snapshot) {
+                            if (snapshot.data == true) {
+                              _videoController.play();
+                              return AspectRatio(
+                                aspectRatio: _videoController.value.aspectRatio,
+                                child: VideoPlayer(_videoController),
+                              );
+                            } else {
+                              return Container();
+                            }
+                          })),
                       Container(
                         padding:
                             EdgeInsets.only(left: 20.0, top: 10.0, right: 20.0),

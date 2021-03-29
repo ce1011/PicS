@@ -40,7 +40,8 @@ class HomePagePost extends StatelessWidget {
                           iconURL: "https://i.imgur.com/BoN9kdC.png",
                           postDate: i.data()['postTime'],
                           postID: i.id,
-                          description: i.data()['description'])
+                          description: i.data()['description'],
+                      videoMode: i.data()['video'],)
                   ],
                 ),
               ));

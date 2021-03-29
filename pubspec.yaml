@@ -41,6 +41,8 @@ dependencies:
   fluro: ^2.0.3
   link: ^1.0.0
   flutter_sound: ^7.7.0+1
+  video_player: ^2.1.0
+  universal_html: ^1.2.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

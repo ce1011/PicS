@@ -67,10 +67,10 @@ class SelectChatPage extends StatelessWidget {
                           children: [
                             for (var i in snapshot.data)
                               FutureBuilder(
-                                  future: (firebaseUserDataAgent.getDisplayName(i
-                                      .data()['UID']
-                                      .toString()
-                                      .substring(1, 29)) ==
+                                  future: (i
+                                              .data()['UID']
+                                              .toString()
+                                              .substring(1, 29) ==
                                           Provider.of<LoginStateNotifier>(
                                                   context,
                                                   listen: false)
@@ -84,21 +84,45 @@ class SelectChatPage extends StatelessWidget {
                                           .toString()
                                           .substring(1, 29)),
                                   builder: (BuildContext context,
-                                      AsyncSnapshot<String>
-                                          snapshotDisplayName) {
+                                      AsyncSnapshot<String> snapshotDisplayName) {
                                     if (snapshotDisplayName.connectionState ==
                                         ConnectionState.done) {
                                       if (snapshotDisplayName.hasError) {
                                         return Text("Error");
                                       } else {
                                         print(i
-                                            .data()['UID']
-                                            .toString()
-                                            .substring(1, 29));
+                                                .data()['UID']
+                                                .toString()
+                                                .substring(1, 29) +
+                                            " " +
+                                            (firebaseUserDataAgent
+                                                        .getDisplayName(i
+                                                            .data()['UID']
+                                                            .toString()
+                                                            .substring(
+                                                                1, 29)) ==
+                                                    Provider.of<LoginStateNotifier>(
+                                                            context,
+                                                            listen: false)
+                                                        .getUID())
+                                                .toString());
                                         print(i
-                                            .data()['UID']
-                                            .toString()
-                                            .substring(37, 65));
+                                                .data()['UID']
+                                                .toString()
+                                                .substring(37, 65) +
+                                            " " +
+                                            (firebaseUserDataAgent
+                                                        .getDisplayName(i
+                                                            .data()['UID']
+                                                            .toString()
+                                                            .substring(
+                                                                37, 65)) ==
+                                                    Provider.of<LoginStateNotifier>(
+                                                            context,
+                                                            listen: false)
+                                                        .getUID())
+                                                .toString());
+
                                         return ListTile(
                                           onTap: () {
                                             Navigator.push(

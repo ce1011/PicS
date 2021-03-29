@@ -8,6 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
+import 'package:video_player/video_player.dart';
+import 'dart:io';
 
 class PickImagePage extends StatefulWidget {
   @override
@@ -22,24 +24,42 @@ class _PickImagePageState extends State<PickImagePage> {
       firebase_storage.FirebaseStorage.instance;
 
   Uint8List _image;
+  VideoPlayerController _videoController;
   final picker = ImagePicker();
   List<String> groupList;
   String visiblePermissionPath, ableToCommentForPath;
   bool visibleForPublic = true;
   bool ableToCommentForPublic = true;
+  bool videoMode = false;
+  File videoPath;
 
   Future getImageFromGallery() async {
     FilePickerResult result = await FilePicker.platform
-        .pickFiles(type: FileType.image, withData: true);
+        .pickFiles(type: FileType.media, withData: true);
 
-    setState(() {
-      if (result != null) {
-        PlatformFile file = result.files.first;
+    if (result != null) {
+      PlatformFile file = result.files.first;
+
+      if (file.extension != "mp4") {
         _image = file.bytes;
       } else {
-        print('No image selected.');
+        videoPath = File(file.path);
+        _videoController = VideoPlayerController.file(videoPath);
+        videoMode = true;
       }
-    });
+
+      setState(() {});
+    } else {
+      print('No image selected.');
+    }
+  }
+
+  Future<bool> loadVideo() async {
+    print("Start Initialize");
+    //await _videoController.setLooping(true);
+    await _videoController.initialize();
+
+    return true;
   }
 
   Future postClipToDatabase() async {
@@ -55,15 +75,24 @@ class _PickImagePageState extends State<PickImagePage> {
       'permission': {
         'ableToCommentForPublic': ableToCommentForPublic,
         'visibleForPublic': visibleForPublic,
-        'ableToCommentFor': groupDB.doc(ableToCommentForPath.substring(8)) ,
+        'ableToCommentFor': groupDB.doc(ableToCommentForPath.substring(8)),
         'visibleFor': groupDB.doc(visiblePermissionPath.substring(8))
-      }
+      },
+      'video': videoMode
     }).then((value) => postID = value.id);
 
-    try {
-      await storageInstance.ref('post/' + postID + '.jpg').putData(_image);
-    } on FirebaseException catch (e) {
-      print("Error");
+    if (videoMode == false) {
+      try {
+        await storageInstance.ref('post/' + postID + '.jpg').putData(_image);
+      } on FirebaseException catch (e) {
+        print("Error");
+      }
+    } else {
+      try {
+        await storageInstance.ref('post/' + postID + '.mp4').putFile(videoPath);
+      } on FirebaseException catch (e) {
+        print("Error");
+      }
     }
   }
 
@@ -87,6 +116,13 @@ class _PickImagePageState extends State<PickImagePage> {
   }
 
   @override
+  void dispose() {
+    // TODO: implement dispose
+    _videoController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
@@ -101,10 +137,26 @@ class _PickImagePageState extends State<PickImagePage> {
           child: Column(
             children: [
               Center(
-                child: _image == null
-                    ? Text('No image selected.')
-                    : Image.memory(_image),
-              ),
+                  child: (_image == null)
+                      ? Text('No image/video selected.')
+                      : Image.memory(_image)),
+              Center(
+                  child: (_videoController == null)
+                      ? Text("NO")
+                      : FutureBuilder(
+                          future: loadVideo(),
+                          builder: (builder, snapshot) {
+                            if (snapshot.data == true) {
+                              _videoController.play();
+                              print(_videoController.dataSourceType);
+                              return AspectRatio(
+                                aspectRatio: _videoController.value.aspectRatio,
+                                child: VideoPlayer(_videoController),
+                              );
+                            } else {
+                              return Text("Readying");
+                            }
+                          })),
               Center(
                   child: TextFormField(
                 decoration: const InputDecoration(
