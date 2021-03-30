@@ -7,14 +7,17 @@ import 'package:flutter/foundation.dart';
 
 import '../../component/Comment_View.dart';
 import '../comment/Crop_Page.dart';
+import '../comment/Video_Trimming_Page.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class ViewCommentPage extends StatelessWidget {
-  String postID, imageURL, postCreatorUID;
+  String postID, imageURL, postCreatorUID, videoURL;
+  bool videoMode;
 
-  ViewCommentPage({Key key, @required this.postID}) : super(key: key);
+  ViewCommentPage({Key key, @required this.postID, @required this.videoMode})
+      : super(key: key);
 
   Uint8List photoByte;
   ImageProcess.Image photo;
@@ -22,30 +25,37 @@ class ViewCommentPage extends StatelessWidget {
   firebase_storage.FirebaseStorage _storageInstance =
       firebase_storage.FirebaseStorage.instance;
 
-
-
   Future<List<QueryDocumentSnapshot>> getCommentData() async {
     String url, postDocumentName;
     List<QueryDocumentSnapshot> commentList, postData;
-    url =
-        await _storageInstance.ref('/post/' + postID + '.jpg').getDownloadURL();
-
-    var response = await http.get(url);
-    this.photoByte = response.bodyBytes;
-    this.photo = ImageProcess.decodeJpg(photoByte);
 
     CollectionReference post = firestoreInstance.collection("post");
 
-    await post
-        .where("__name__", isEqualTo: postID)
-        .get()
-        .then((data) => {postDocumentName = data.docs[0].id, postCreatorUID = data.docs[0]['UID']});
-    print(postCreatorUID);
+    await post.where("__name__", isEqualTo: postID).get().then((data) => {
+          postDocumentName = data.docs[0].id,
+          postCreatorUID = data.docs[0]['UID'],
+          videoMode = data.docs[0]['video']
+        });
+    print(videoMode.toString());
     await firestoreInstance
         .collection("post/" + postDocumentName + "/comment")
-    .orderBy("commentID")
+        .orderBy("commentID")
         .get()
         .then((data) => commentList = data.docs);
+    if (videoMode == false) {
+      url = await _storageInstance
+          .ref('/post/' + postID + '.jpg')
+          .getDownloadURL();
+
+      var response = await http.get(url);
+      this.photoByte = response.bodyBytes;
+      this.photo = ImageProcess.decodeJpg(photoByte);
+    } else {
+      videoURL = await _storageInstance
+          .ref('/post/' + postID + '.mp4')
+          .getDownloadURL();
+    }
+
     return commentList;
   }
 
@@ -55,20 +65,44 @@ class ViewCommentPage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Comment"),
         actions: [
-          IconButton(
-              icon: Icon(Icons.add_comment),
-              onPressed: () {
-                print(postID);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => CropPage(
+          (videoMode == false)
+              ? IconButton(
+                  icon: Icon(Icons.add_comment),
+                  onPressed: () {
+                    print(postID);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CropPage(
+                                photoByte: photoByte,
+                                postID: postID,
+                              )),
+                    );
+                  })
+              : PopupMenuButton(
+                  icon: Icon(Icons.add_comment),
+                  itemBuilder: (context) {
+                    var commentType = List<PopupMenuEntry<Object>>();
 
-                            photoByte: photoByte,
-                            postID: postID,
-                          )),
-                );
-              })
+                    commentType
+                        .add(PopupMenuItem(child: Text("Clip"), value: 1));
+
+                    return commentType;
+                  },
+                  onSelected: (value) async {
+                    switch (value) {
+                      case 1:
+                        {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    VideoTrimmingPage(url: videoURL, postID: postID,)),
+                          );
+                        }
+                    }
+                  },
+                )
         ],
       ),
       body: SingleChildScrollView(
@@ -82,38 +116,41 @@ class ViewCommentPage extends StatelessWidget {
                     : 0,
               ),
               child: FutureBuilder<List<QueryDocumentSnapshot>>(
-        future: getCommentData(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasError) {
-              return Text("Error: ${snapshot.error}");
-            } else {
-              return Column(children: [
-                for (var i in snapshot.data)
-                  Container(
-                      padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
-                      child: CommentView(
-                        username: i.data()['UID'],
-                        iconURL: "https://i.imgur.com/BoN9kdC.png",
-                        commentDate: i.data()['commentTime'],
-                        photoByte: photoByte,
-                        StartX: i.data()['startX'],
-                        StartY: i.data()['startY'],
-                        EndX: i.data()['endX'],
-                        EndY: i.data()['endY'],
-                        description: i.data()['content'],
-                        postCreatorUID: postCreatorUID,
-                        commentID: i.id,
-                        postID: postID,
-                      )),
-              ]);
-            }
-          } else {
-            return CircularProgressIndicator();
-          }
-        },
-      ))),
+                future: getCommentData(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}");
+                    } else {
+                      return Column(children: [
+                        for (var i in snapshot.data)
+                          (videoMode == false)
+                              ? Container(
+                                  padding:
+                                      EdgeInsets.only(top: 10.0, bottom: 10.0),
+                                  child: CommentView(
+                                    username: i.data()['UID'],
+                                    iconURL: "https://i.imgur.com/BoN9kdC.png",
+                                    commentDate: i.data()['commentTime'],
+                                    photoByte: photoByte,
+                                    StartX: i.data()['startX'],
+                                    StartY: i.data()['startY'],
+                                    EndX: i.data()['endX'],
+                                    EndY: i.data()['endY'],
+                                    description: i.data()['content'],
+                                    postCreatorUID: postCreatorUID,
+                                    commentID: i.id,
+                                    postID: postID,
+                                  ))
+                              : Container(),
+                      ]);
+                    }
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                },
+              ))),
     );
   }
 }

@@ -80,7 +80,9 @@ class _PostViewState extends State<PostView> {
 
 
 
-  Future<void> deleteConfirm() async {}
+  Future<void> deleteConfirm() async {
+
+  }
 
   @override
   Widget build(BuildContext context) {

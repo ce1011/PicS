@@ -13,4 +13,10 @@ class FirebasePostDataAgent{
     return url;
   }
 
+  Future<String> getPostVideoURL(String postID) async {
+    String url;
+    url = await _storageInstance.ref('/post/'+postID+'.mp4').getDownloadURL();
+    return url;
+  }
+
 }
