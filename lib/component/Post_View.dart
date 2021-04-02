@@ -44,7 +44,7 @@ class _PostViewState extends State<PostView> {
     print("Start Initialize");
     //await _videoController.setLooping(true);
     await _videoController.initialize();
-    await     _videoController.setLooping(true);
+    //await     _videoController.setLooping(true);
 
     return true;
   }

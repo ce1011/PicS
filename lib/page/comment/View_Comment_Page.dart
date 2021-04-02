@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
 
 import '../../component/Comment_View.dart';
+import '../../component/Comment_View_Video.dart';
 import '../comment/Crop_Page.dart';
 import '../comment/Video_Trimming_Page.dart';
 
@@ -36,10 +37,10 @@ class ViewCommentPage extends StatelessWidget {
           postCreatorUID = data.docs[0]['UID'],
           videoMode = data.docs[0]['video']
         });
-    print(videoMode.toString());
+    print(postID);
     await firestoreInstance
         .collection("post/" + postDocumentName + "/comment")
-        .orderBy("commentID")
+        .orderBy("commentTime")
         .get()
         .then((data) => commentList = data.docs);
     if (videoMode == false) {
@@ -54,6 +55,8 @@ class ViewCommentPage extends StatelessWidget {
       videoURL = await _storageInstance
           .ref('/post/' + postID + '.mp4')
           .getDownloadURL();
+
+      print(commentList.length);
     }
 
     return commentList;
@@ -96,8 +99,10 @@ class ViewCommentPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    VideoTrimmingPage(url: videoURL, postID: postID,)),
+                                builder: (context) => VideoTrimmingPage(
+                                      url: videoURL,
+                                      postID: postID,
+                                    )),
                           );
                         }
                     }
@@ -125,7 +130,7 @@ class ViewCommentPage extends StatelessWidget {
                     } else {
                       return Column(children: [
                         for (var i in snapshot.data)
-                          (videoMode == false)
+                          (!videoMode)
                               ? Container(
                                   padding:
                                       EdgeInsets.only(top: 10.0, bottom: 10.0),
@@ -143,7 +148,18 @@ class ViewCommentPage extends StatelessWidget {
                                     commentID: i.id,
                                     postID: postID,
                                   ))
-                              : Container(),
+                              : Container(
+                                  padding:
+                                      EdgeInsets.only(top: 10.0, bottom: 10.0),
+                                  child: CommentViewVideo(
+                                    username: i.data()['UID'],
+                                    iconURL: "https://i.imgur.com/BoN9kdC.png",
+                                    commentDate: i.data()['commentTime'],
+                                    description: i.data()['content'],
+                                    postCreatorUID: postCreatorUID,
+                                    commentID: i.id,
+                                    postID: postID,
+                                  )),
                       ]);
                     }
                   } else {
