@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'chat/Select_Chat_Page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'setting/Setting.dart';
+import 'setting/Setting_Group_List_Page.dart';
 import '../component/Circle_Icon.dart';
 
 class HomePage extends StatefulWidget {
@@ -78,6 +79,17 @@ class _HomePageState extends State<HomePage> {
             subtitle: Text(
                 Provider.of<LoginStateNotifier>(context, listen: false)
                     .username),
+          ),
+          ListTile(
+            leading: Icon(Icons.settings),
+            title: Text('Permission Setting'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SettingGroupListPage()),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.settings),

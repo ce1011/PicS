@@ -11,7 +11,6 @@ class VideoTrimmingPage extends StatefulWidget {
   @override
   _VideoTrimmingPageState createState() => _VideoTrimmingPageState();
 
-
   static _VideoTrimmingPageState of(BuildContext context) =>
       context.findAncestorStateOfType<_VideoTrimmingPageState>();
 }
@@ -27,7 +26,7 @@ class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
   RangeValues _timeDurationRange = new RangeValues(0, 1);
 
   final TextEditingController commentInputController =
-  new TextEditingController();
+      new TextEditingController();
 
   Future<bool> loadVideo() async {
     print(widget.url);
@@ -42,19 +41,27 @@ class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
     return true;
   }
 
-  Future<bool> postComment() async{
+  Future<bool> postComment() async {
     var result;
-    try{
-      await functions.httpsCallable('postVideoClipComment').call(<String, dynamic>{'postID': widget.postID,'startTime': _timeDurationRange.start, 'endTime': _timeDurationRange.end, 'comment' : commentInputController.text, }).then((value) => result= value);
+    try {
+      await functions
+          .httpsCallable('postVideoClipComment')
+          .call(<String, dynamic>{
+        'postID': widget.postID,
+        'startTime': _timeDurationRange.start,
+        'endTime': _timeDurationRange.end,
+        'comment': commentInputController.text,
+      }).then((value) => result = value.data['status']);
 
-      print(result.data);
-  } on FirebaseFunctionsException catch  (e) {
-  print('Cloud functions exception with code: ${e.code}, and Details: ${e.details}, with message: ${e.message} ');
-  } catch (e) {
-  print(e.toString());
-  }
-
-    return false;
+      if (result == "success") {
+        return true;
+      }
+    } on FirebaseFunctionsException catch (e) {
+      print(
+          'Cloud functions exception with code: ${e.code}, and Details: ${e.details}, with message: ${e.message} ');
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   @override
@@ -118,7 +125,6 @@ class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
                       )
-
                     ],
                   ),
                 );
