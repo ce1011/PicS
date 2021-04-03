@@ -60,7 +60,7 @@ class _ViewWaitForAcceptPageState extends State<ViewWaitForAcceptPage> {
                                                 listen: false)
                                                 .getUID() +
                                             "/groups")
-                                            .doc("waitForTargetUserAccept")
+                                            .doc("waitForUserAccept")
                                             .update({'UID.' + i: FieldValue.delete()});
 
                                         firestoreInstance

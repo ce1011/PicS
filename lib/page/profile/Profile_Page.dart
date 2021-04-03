@@ -218,7 +218,7 @@ class ProfilePage extends StatelessWidget {
                                                           UID +
                                                           "/groups")
                                                       .doc(
-                                                          "waitForTargetUserAccept")
+                                                          "waitForAccept")
                                                       .update({
                                                     'UID.' +
                                                         Provider.of<LoginStateNotifier>(
@@ -250,7 +250,7 @@ class ProfilePage extends StatelessWidget {
                                                           UID +
                                                           "/groups")
                                                       .doc(
-                                                          "waitForTargetUserAccept")
+                                                          "waitForAccept")
                                                       .update({
                                                     'UID.' +
                                                         Provider.of<LoginStateNotifier>(
