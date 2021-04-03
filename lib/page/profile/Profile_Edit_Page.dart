@@ -35,20 +35,16 @@ class ProfileEditPage extends StatelessWidget {
     if (result != null) {
       PlatformFile file = result.files.first;
 
-        _image = file.bytes;
-
+      _image = file.bytes;
     } else {
       print('No image selected.');
     }
   }
 
-
   Future<bool> commitProfileChange(BuildContext context) async {
     CollectionReference profile = firestoreInstance.collection("user");
 
     String UID;
-
-
 
     bool success;
 
@@ -113,7 +109,8 @@ class ProfileEditPage extends StatelessWidget {
         child: Column(
           children: [
             FutureBuilder(
-              future: firebaseUserDataAgent.getUserIconURL(Provider.of<LoginStateNotifier>(context, listen: false).UID),
+              future: firebaseUserDataAgent.getUserIconURL(
+                  Provider.of<LoginStateNotifier>(context, listen: false).UID),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return InkWell(
@@ -124,27 +121,38 @@ class ProfileEditPage extends StatelessWidget {
                           shape: BoxShape.circle,
                           image: DecorationImage(
                               fit: BoxFit.fill,
-                              image: NetworkImage(
-                                  snapshot.data))),
+                              image: NetworkImage(snapshot.data))),
                     ),
-                    onTap: ()async {
+                    onTap: () async {
                       await getImageFromGallery();
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  ProfileIconCropPage(photoByte: _image,)));
+                              builder: (context) => ProfileIconCropPage(
+                                    photoByte: _image,
+                                  )));
                     },
                   );
                 } else {
-                  return Container(
-                    height: 400,
-                    width: 400,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                            fit: BoxFit.fill,
-                            image: AssetImage('photo/emptyusericon.png'))),
+                  return InkWell(
+                    child: Container(
+                      height: 400,
+                      width: 400,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: AssetImage('photo/emptyusericon.jpg'))),
+
+                    ),                      onTap: () async {
+                    await getImageFromGallery();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileIconCropPage(
+                              photoByte: _image,
+                            )));
+                  },
                   );
                 }
               },

@@ -311,7 +311,7 @@ class _ChatPageState extends State<ChatPage> {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             fit: BoxFit.fill,
-                            image: AssetImage('photo/emptyusericon.png'))),
+                            image: AssetImage('photo/emptyusericon.jpg'))),
                   );
                 }
               },
