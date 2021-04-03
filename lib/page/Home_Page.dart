@@ -9,6 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'setting/Setting.dart';
 import 'setting/Setting_Group_List_Page.dart';
 import '../component/Circle_Icon.dart';
+import 'friends/View_Friend.dart';
+import 'friends/View_Wait_For_Accept.dart';
+import '../firebase/Firebase_User_Data_Agent.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,6 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
   FirebaseAuth auth = FirebaseAuth.instance;
   int selectedHomePage = 0;
   List<Widget> widgetList = <Widget>[HomePagePost(), HomePageProfile()];
@@ -71,14 +75,51 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
         children: [
           ListTile(
-            leading: CircleIcon(
-                url:
-                    "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg"),
+            leading: FutureBuilder(
+              future: firebaseUserDataAgent.getUserIconURL(Provider.of<LoginStateNotifier>(context, listen: false).UID),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return CircleIcon(url: snapshot.data);
+                } else {
+                  return Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: AssetImage('photo/emptyusericon.png'))),
+                  );
+                }
+              },
+            ),
             title: Text(Provider.of<LoginStateNotifier>(context, listen: false)
                 .displayName),
             subtitle: Text(
                 Provider.of<LoginStateNotifier>(context, listen: false)
                     .username),
+          ),
+          ListTile(
+            leading: Icon(Icons.settings),
+            title: Text('Friends'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ViewFriendPage()),
+              );
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.settings),
+            title: Text('Wait For Accept'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ViewWaitForAcceptPage()),
+              );
+            },
           ),
           ListTile(
             leading: Icon(Icons.settings),

@@ -49,7 +49,7 @@ class SettingGroupListPage extends StatelessWidget {
                               
                               await firestoreInstance.collection("groupDB/" +
                                   Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
-                                  "/groups").doc(addPermissionGroupTextController.text).set({'visibleInPermissionGroupEditing': true});
+                                  "/groups").doc(addPermissionGroupTextController.text).set({'visibleInPermissionGroupEditing': true , 'ableForPostPermissionManagement': true});
 
 
                               Navigator.of(context).pop();

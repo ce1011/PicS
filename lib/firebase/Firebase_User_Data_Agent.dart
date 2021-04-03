@@ -8,7 +8,12 @@ class FirebaseUserDataAgent {
   firebase_storage.FirebaseStorage _storageInstance =
       firebase_storage.FirebaseStorage.instance;
 
-  Future<String> getUserIconURL(String UID) {}
+  Future<String> getUserIconURL(String UID) async {
+    String url;
+    url =
+        await _storageInstance.ref('/usericon/' + UID + '.jpg').getDownloadURL();
+    return url;
+  }
 
   Future<String> getDocumentID(String UID) async {
     String documentID;
@@ -55,6 +60,7 @@ class FirebaseUserDataAgent {
     return displayName;
   }
 
+
   Future<String> getUserPersonalDescription(String UID) async {
     String description;
 
@@ -67,5 +73,39 @@ class FirebaseUserDataAgent {
     return description;
   }
 
-  Future<QuerySnapshot> getUserCustomGroupList(String UID) {}
+  Future<bool> isFriend(String ownUID, String TargetUID) async {
+    bool isFriend = false;
+
+    CollectionReference _fireStoreInstance =
+        FirebaseFirestore.instance.collection("groupDB");
+
+    await _fireStoreInstance
+        .doc(ownUID)
+        .collection("groups")
+        .doc("friends")
+        .get()
+        .then((value) => {
+              if (value.data()['UID'][TargetUID] != null) {isFriend = true}
+            });
+
+    return isFriend;
+  }
+
+  Future<bool> isWaitForAccept(String ownUID, String TargetUID) async {
+    bool isWaitForAccept = false;
+
+    CollectionReference _fireStoreInstance =
+    FirebaseFirestore.instance.collection("groupDB");
+
+    await _fireStoreInstance
+        .doc(ownUID)
+        .collection("groups")
+        .doc("waitForTargetUserAccept")
+        .get()
+        .then((value) => {
+      if (value.data()['UID'][TargetUID] != null) {isWaitForAccept = true}
+    });
+
+    return isWaitForAccept;
+  }
 }

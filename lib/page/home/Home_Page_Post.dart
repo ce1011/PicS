@@ -37,7 +37,6 @@ class HomePagePost extends StatelessWidget {
                     for (var i in snapshot.data)
                       PostView(
                           username: i.data()['UID'],
-                          iconURL: "https://i.imgur.com/BoN9kdC.png",
                           postDate: i.data()['postTime'],
                           postID: i.id,
                           description: i.data()['description'],

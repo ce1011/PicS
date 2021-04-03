@@ -9,6 +9,7 @@ import '../../firebase/Firebase_User_Data_Agent.dart';
 import '../../component/Post_View.dart';
 import '../profile/Profile_Edit_Page.dart';
 
+
 class HomePageProfile extends StatelessWidget {
   String UID;
   String description;
@@ -56,9 +57,24 @@ class HomePageProfile extends StatelessWidget {
             Container(
               padding: EdgeInsets.only(top: 10.0),
               child: ListTile(
-                  leading: CircleIcon(
-                      url:
-                          "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg"),
+                  leading: FutureBuilder(
+                    future: firebaseUserDataAgent.getUserIconURL(Provider.of<LoginStateNotifier>(context, listen: false).UID),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return CircleIcon(url: snapshot.data);
+                      } else {
+                        return Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: AssetImage('photo/emptyusericon.png'))),
+                        );
+                      }
+                    },
+                  ),
                   title: Text(
                       Provider.of<LoginStateNotifier>(context, listen: true)
                           .displayName),
@@ -102,7 +118,6 @@ class HomePageProfile extends StatelessWidget {
                                 for (var i in snapshot.data)
                                   PostView(
                                       username: i.data()['UID'],
-                                      iconURL: "https://i.imgur.com/BoN9kdC.png",
                                       postDate: i.data()['postTime'],
                                       postID: i.id,
                                       description: i.data()['description'],

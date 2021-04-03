@@ -74,7 +74,8 @@ flutter:
     - assets/animation/login.flr
     - assets/animation/register.flr
     - assets/animation/connection.flr
-    - assets/photo/test.jpeg
+    - assets/photo/emptyusericon.png
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -37,16 +37,19 @@ class ViewCommentPage extends StatelessWidget {
           postCreatorUID = data.docs[0]['UID'],
           videoMode = data.docs[0]['video']
         });
-    print(postID);
+
     await firestoreInstance
         .collection("post/" + postDocumentName + "/comment")
         .orderBy("commentTime")
         .get()
         .then((data) => commentList = data.docs);
+
     if (videoMode == false) {
       url = await _storageInstance
           .ref('/post/' + postID + '.jpg')
           .getDownloadURL();
+
+      print(postID + videoMode.toString());
 
       var response = await http.get(url);
       this.photoByte = response.bodyBytes;

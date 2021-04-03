@@ -73,9 +73,24 @@ class ProfilePage extends StatelessWidget {
                           Container(
                             padding: EdgeInsets.only(top: 10.0),
                             child: ListTile(
-                                leading: CircleIcon(
-                                    url:
-                                        "https://pbs.twimg.com/profile_images/1343584679664873479/Xos3xQfk_400x400.jpg"),
+                                leading: FutureBuilder(
+                                  future: userAgent.getUserIconURL(UID),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return CircleIcon(url: snapshot.data);
+                                    } else {
+                                      return Container(
+                                        height: 50,
+                                        width: 50,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                                fit: BoxFit.fill,
+                                                image: AssetImage('photo/emptyusericon.png'))),
+                                      );
+                                    }
+                                  },
+                                ),
                                 title:
                                     Text(snapshot.data.data()['displayName']),
                                 subtitle:
@@ -136,7 +151,8 @@ class ProfilePage extends StatelessWidget {
                                                 builder: (context) => ChatPage(
                                                       uid: UID,
                                                       displayName:
-                                                      snapshot.data.data()['displayName'],
+                                                          snapshot.data.data()[
+                                                              'displayName'],
                                                       chatDocumentID: value.id,
                                                     )),
                                           ));
@@ -146,15 +162,114 @@ class ProfilePage extends StatelessWidget {
                                         MaterialPageRoute(
                                             builder: (context) => ChatPage(
                                                   uid: UID,
-                                                  displayName:
-                                                  snapshot.data.data()['displayName'],
+                                                  displayName: snapshot.data
+                                                      .data()['displayName'],
                                                   chatDocumentID: data[0].id,
                                                 )),
                                       );
                                     }
                                   },
                                   child: Text("Chat"),
-                                )
+                                ),
+                          FutureBuilder(
+                              future: Future.wait([
+                                firebaseUserDataAgent.isFriend(
+                                    Provider.of<LoginStateNotifier>(context,
+                                            listen: false)
+                                        .getUID(),
+                                    UID)
+                              ]),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  //print("is Wait For Accept" + snapshot.data[1].toString());
+                                  if (snapshot.data[0] == true) {
+                                    return Container();
+                                  } else {
+                                    return FutureBuilder(
+                                        future: firebaseUserDataAgent
+                                            .isWaitForAccept(
+                                                Provider.of<LoginStateNotifier>(
+                                                        context,
+                                                        listen: false)
+                                                    .getUID(),
+                                                UID),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            if (snapshot.data == true) {
+                                              return RaisedButton(
+                                                child: Text("Wait For Accept"),
+                                                onPressed: () {
+                                                  firestoreInstance
+                                                      .collection("groupDB/" +
+                                                          Provider.of<LoginStateNotifier>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .getUID() +
+                                                          "/groups")
+                                                      .doc(
+                                                          "waitForTargetUserAccept")
+                                                      .update({
+                                                    'UID.' + UID:
+                                                        FieldValue.delete()
+                                                  });
+
+                                                  firestoreInstance
+                                                      .collection("groupDB/" +
+                                                          UID +
+                                                          "/groups")
+                                                      .doc(
+                                                          "waitForTargetUserAccept")
+                                                      .update({
+                                                    'UID.' +
+                                                        Provider.of<LoginStateNotifier>(
+                                                                context,
+                                                                listen: false)
+                                                            .getUID(): FieldValue
+                                                        .delete()
+                                                  });
+                                                },
+                                              );
+                                            } else {
+                                              return RaisedButton(
+                                                child: Text("Add Friends"),
+                                                onPressed: () {
+                                                  firestoreInstance
+                                                      .collection("groupDB/" +
+                                                          Provider.of<LoginStateNotifier>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .getUID() +
+                                                          "/groups")
+                                                      .doc(
+                                                          "waitForTargetUserAccept")
+                                                      .update(
+                                                          {'UID.' + UID: true});
+
+                                                  firestoreInstance
+                                                      .collection("groupDB/" +
+                                                          UID +
+                                                          "/groups")
+                                                      .doc(
+                                                          "waitForTargetUserAccept")
+                                                      .update({
+                                                    'UID.' +
+                                                        Provider.of<LoginStateNotifier>(
+                                                                context,
+                                                                listen: false)
+                                                            .getUID(): true
+                                                  });
+                                                },
+                                              );
+                                            }
+                                          } else {
+                                            return Container();
+                                          }
+                                        });
+                                  }
+                                } else {
+                                  return Container();
+                                }
+                              })
                         ],
                       ));
                 } else {
@@ -182,12 +297,12 @@ class ProfilePage extends StatelessWidget {
                                 children: [
                                   for (var i in snapshot.data)
                                     PostView(
-                                        username: i.data()['UID'],
-                                        iconURL:
-                                            "https://i.imgur.com/BoN9kdC.png",
-                                        postDate: i.data()['postTime'],
-                                        postID: i.id,
-                                        description: i.data()['description']),
+                                      username: i.data()['UID'],
+                                      postDate: i.data()['postTime'],
+                                      postID: i.id,
+                                      description: i.data()['description'],
+                                      videoMode: i.data()['video'],
+                                    ),
                                 ],
                               ),
                             ),

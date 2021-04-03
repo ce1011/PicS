@@ -112,13 +112,12 @@ class _PickImagePageState extends State<PickImagePage> {
 
   Future<List<QueryDocumentSnapshot>> getPermissionGroup(
       BuildContext context) async {
-    CollectionReference group = firestoreInstance.collection("groupDB/" +
-        Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
-        "/groups");
 
     List<QueryDocumentSnapshot> permissionGroupList;
 
-    await group.get().then((value) => permissionGroupList = value.docs);
+    await firestoreInstance.collection("groupDB/" +
+        Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
+        "/groups").where('ableForPostPermissionManagement' , isEqualTo: true).get().then((value) => permissionGroupList = value.docs);
 
     return permissionGroupList;
   }

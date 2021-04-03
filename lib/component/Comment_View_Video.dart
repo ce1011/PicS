@@ -76,7 +76,24 @@ class _CommentViewVideoState extends State<CommentViewVideo> {
               ListTile(
                 dense: true,
                 leading: InkWell(
-                  child: CircleIcon(url: widget.iconURL),
+                  child: FutureBuilder(
+                    future: userAgent.getUserIconURL(widget.username),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return CircleIcon(url: snapshot.data);
+                      } else {
+                        return Container(
+                          height: 50,
+                          width: 50,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: AssetImage('photo/emptyusericon.png'))),
+                        );
+                      }
+                    },
+                  ),
                   onTap: () {
                     Navigator.pushNamed(context, "profile/" + widget.username);
                   },

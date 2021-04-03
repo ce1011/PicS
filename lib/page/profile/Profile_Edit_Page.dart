@@ -1,7 +1,17 @@
+import 'dart:typed_data';
+
+import 'package:image_picker/image_picker.dart';
+
 import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../../firebase/Firebase_User_Data_Agent.dart';
+import '../../component/Circle_Icon.dart';
+import 'package:file_picker/file_picker.dart';
+import '../../provider/LoginStateNotifier.dart';
+import 'package:provider/provider.dart';
+import '../profile/Profile_Icon_Crop.dart';
 
 class ProfileEditPage extends StatelessWidget {
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
@@ -13,10 +23,32 @@ class ProfileEditPage extends StatelessWidget {
   final TextEditingController descriptionInputController =
       new TextEditingController();
 
+  FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
+
+  Uint8List _image;
+  final picker = ImagePicker();
+
+  Future getImageFromGallery() async {
+    FilePickerResult result = await FilePicker.platform
+        .pickFiles(type: FileType.media, withData: true);
+
+    if (result != null) {
+      PlatformFile file = result.files.first;
+
+        _image = file.bytes;
+
+    } else {
+      print('No image selected.');
+    }
+  }
+
+
   Future<bool> commitProfileChange(BuildContext context) async {
     CollectionReference profile = firestoreInstance.collection("user");
 
     String UID;
+
+
 
     bool success;
 
@@ -80,6 +112,43 @@ class ProfileEditPage extends StatelessWidget {
             top: 8.0),
         child: Column(
           children: [
+            FutureBuilder(
+              future: firebaseUserDataAgent.getUserIconURL(Provider.of<LoginStateNotifier>(context, listen: false).UID),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return InkWell(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: NetworkImage(
+                                  snapshot.data))),
+                    ),
+                    onTap: ()async {
+                      await getImageFromGallery();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  ProfileIconCropPage(photoByte: _image,)));
+                    },
+                  );
+                } else {
+                  return Container(
+                    height: 400,
+                    width: 400,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: AssetImage('photo/emptyusericon.png'))),
+                  );
+                }
+              },
+            ),
             TextField(
               controller: userNameInputController,
               decoration: InputDecoration(
