@@ -139,9 +139,37 @@ class SelectChatPage extends StatelessWidget {
                                             );
                                           },
                                           dense: false,
-                                          leading: CircleIcon(
-                                              url:
-                                                  "https://i.imgur.com/BoN9kdC.png"),
+                                          leading: FutureBuilder(
+                                            future: (i
+                                                .data()['UID']
+                                                .toString()
+                                                .substring(1, 29) ==
+                                                Provider.of<LoginStateNotifier>(
+                                                    context,
+                                                    listen: false)
+                                                    .getUID()) ? firebaseUserDataAgent.getUserIconURL(i
+                                                .data()['UID']
+                                                .toString()
+                                                .substring(37, 65)): firebaseUserDataAgent.getUserIconURL(i
+                                                .data()['UID']
+                                                .toString()
+                                                .substring(1, 29)),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                return CircleIcon(url: snapshot.data);
+                                              } else {
+                                                return Container(
+                                                  height: 50,
+                                                  width: 50,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.circle,
+                                                      image: DecorationImage(
+                                                          fit: BoxFit.fill,
+                                                          image: AssetImage('photo/emptyusericon.png'))),
+                                                );
+                                              }
+                                            },
+                                          ),
                                           title: Text(snapshotDisplayName.data),
                                           subtitle: Text(""),
                                         );

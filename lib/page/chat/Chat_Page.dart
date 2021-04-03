@@ -15,6 +15,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:link/link.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
+import '../../firebase/Firebase_User_Data_Agent.dart';
 
 import 'dart:typed_data';
 
@@ -33,6 +34,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+
   Uint8List _image;
   File _file;
   int lastIndex;
@@ -47,6 +49,8 @@ class _ChatPageState extends State<ChatPage> {
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   firebase_storage.FirebaseStorage storageInstance =
       firebase_storage.FirebaseStorage.instance;
+
+  FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
 
   List<QueryDocumentSnapshot> chatContentList;
 
@@ -294,7 +298,24 @@ class _ChatPageState extends State<ChatPage> {
     return Scaffold(
         appBar: AppBar(
           title: Row(children: [
-            CircleIcon(url: "https://i.imgur.com/BoN9kdC.png"),
+            FutureBuilder(
+              future: firebaseUserDataAgent.getUserIconURL(widget.uid),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return CircleIcon(url: snapshot.data);
+                } else {
+                  return Container(
+                    height: 50,
+                    width: 50,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: AssetImage('photo/emptyusericon.png'))),
+                  );
+                }
+              },
+            ),
             Container(padding: EdgeInsets.only(left: 15)),
             Text(widget.displayName)
           ]),
