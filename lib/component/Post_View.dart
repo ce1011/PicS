@@ -202,7 +202,7 @@ class _PostViewState extends State<PostView> {
                                                 "This action is unrevertible"),
                                             actions: [
                                               TextButton(
-                                                child: Text("Delete"),
+                                                child: Text("Delete", style: TextStyle(color: Colors.greenAccent[400],),),
                                                 onPressed: () async {
                                                   await post
                                                       .doc(widget.postID)

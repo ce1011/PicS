@@ -17,8 +17,7 @@ class ViewCommentPage extends StatelessWidget {
   String postID, imageURL, postCreatorUID, videoURL;
   bool videoMode;
 
-  ViewCommentPage({Key key, @required this.postID, @required this.videoMode})
-      : super(key: key);
+  ViewCommentPage({Key key, @required this.postID}) : super(key: key);
 
   Uint8List photoByte;
   ImageProcess.Image photo;
@@ -65,52 +64,76 @@ class ViewCommentPage extends StatelessWidget {
     return commentList;
   }
 
+  Future<bool> getPostType() async {
+    bool type = false;
+
+    CollectionReference post = firestoreInstance.collection("post");
+
+    await post
+        .where("__name__", isEqualTo: postID)
+        .get()
+        .then((data) => {type = data.docs[0]['video']});
+
+    return type;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Comment"),
         actions: [
-          (videoMode == false)
-              ? IconButton(
-                  icon: Icon(Icons.add_comment),
-                  onPressed: () {
-                    print(postID);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CropPage(
-                                photoByte: photoByte,
-                                postID: postID,
-                              )),
-                    );
-                  })
-              : PopupMenuButton(
-                  icon: Icon(Icons.add_comment),
-                  itemBuilder: (context) {
-                    var commentType = List<PopupMenuEntry<Object>>();
+          FutureBuilder(
+              future: getPostType(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Container(
+                    child: (!videoMode)
+                        ? IconButton(
+                            icon: Icon(Icons.add_comment),
+                            onPressed: () {
+                              print(postID);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CropPage(
+                                          photoByte: photoByte,
+                                          postID: postID,
+                                        )),
+                              );
+                            })
+                        : PopupMenuButton(
+                            icon: Icon(Icons.add_comment),
+                            itemBuilder: (context) {
+                              var commentType = List<PopupMenuEntry<Object>>();
 
-                    commentType
-                        .add(PopupMenuItem(child: Text("Clip"), value: 1));
+                              commentType.add(
+                                  PopupMenuItem(child: Text("Clip"), value: 1));
 
-                    return commentType;
-                  },
-                  onSelected: (value) async {
-                    switch (value) {
-                      case 1:
-                        {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => VideoTrimmingPage(
-                                      url: videoURL,
-                                      postID: postID,
-                                    )),
-                          );
-                        }
-                    }
-                  },
-                )
+                              return commentType;
+                            },
+                            onSelected: (value) async {
+                              switch (value) {
+                                case 1:
+                                  {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              VideoTrimmingPage(
+                                                url: videoURL,
+                                                postID: postID,
+                                              )),
+                                    );
+                                  }
+                              }
+                            },
+                          ),
+                  );
+                } else {
+                  return Container();
+                }
+              })
         ],
       ),
       body: SingleChildScrollView(

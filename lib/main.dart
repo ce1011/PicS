@@ -58,6 +58,7 @@ class MyApp extends StatelessWidget {
                       backgroundColor: Colors.black,
                     ),
                     canvasColor: Colors.black,
+                dialogTheme: DialogTheme(backgroundColor: Colors.black,),
                   )
                 : ThemeData(
                     brightness: Brightness.light,
