@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
+import '../page/Post_Edit_Page.dart';
 import 'Circle_Icon.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../firebase/Firebase_User_Data_Agent.dart';
@@ -226,6 +226,16 @@ class _PostViewState extends State<PostView> {
                                   },
                                 )
                               : Container(),
+                          (widget.username ==
+                              Provider.of<LoginStateNotifier>(context,
+                                  listen: false)
+                                  .getUID()) ? IconButton(icon: Icon(Icons.edit), onPressed: (){
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        PostEditPage(widget.postID, widget.description)));
+                          }) : Container()
                         ],
                       ))
                     ],
