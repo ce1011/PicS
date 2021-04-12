@@ -54,12 +54,11 @@ class _CommentViewVideoState extends State<CommentViewVideo> {
     _videoController = VideoPlayerController.network(url);
 
     print("Start Initialize" + url);
-    //await _videoController.setLooping(true);
     await _videoController.initialize();
-    await _videoController.setLooping(true);
 
     return url;
   }
+
 
   @override
   void dispose() {
@@ -89,7 +88,8 @@ class _CommentViewVideoState extends State<CommentViewVideo> {
                               shape: BoxShape.circle,
                               image: DecorationImage(
                                   fit: BoxFit.fill,
-                                  image: AssetImage('photo/emptyusericon.jpg'))),
+                                  image: AssetImage(
+                                      'assets/photo/emptyusericon.jpg'))),
                         );
                       }
                     },
@@ -128,10 +128,12 @@ class _CommentViewVideoState extends State<CommentViewVideo> {
                       future: getPostVideoURL(),
                       builder: (builder, snapshot) {
                         if (snapshot.hasData) {
-                          _videoController.play();
                           return AspectRatio(
                             aspectRatio: _videoController.value.aspectRatio,
-                            child: VideoPlayer(_videoController),
+                            child: GestureDetector(onTap: (){
+                              print("Comment seek to 0");
+                              _videoController.seekTo(new Duration(milliseconds: 0));
+                            },child: VideoPlayer(_videoController)),
                           );
                         } else {
                           return Container();
@@ -204,6 +206,6 @@ class _CommentViewVideoState extends State<CommentViewVideo> {
               ))
             ],
           )
-        : Container();
+        : Center(child: CircularProgressIndicator(),);
   }
 }

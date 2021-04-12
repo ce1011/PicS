@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../provider/BrightnessNotifier.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class SettingPage extends StatelessWidget {
   @override

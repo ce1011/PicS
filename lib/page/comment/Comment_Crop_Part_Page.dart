@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:image/image.dart' as ImageProcess;
+import 'package:pics/page/comment/View_Comment_Page.dart';
 import '../../component/Comment_Crop_Photo.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../provider/LoginStateNotifier.dart';
@@ -75,6 +76,14 @@ lastIndex = -1;
                   Navigator.popUntil(context, (route) {
                     return count++ == 2;
                   });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ViewCommentPage(
+                              postID: postID,
+                            )),
+                  );
                 } else {
                   print("error");
                 }

@@ -2,6 +2,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
+import 'package:pics/page/comment/View_Comment_Page.dart';
 
 class VideoTrimmingPage extends StatefulWidget {
   String url, postID;
@@ -17,6 +18,8 @@ class VideoTrimmingPage extends StatefulWidget {
 
 class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
   FirebaseFunctions functions = FirebaseFunctions.instance;
+
+  bool posting = false;
 
   int startTime, endTime;
 
@@ -44,6 +47,10 @@ class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
   Future<bool> postComment() async {
     var result;
     try {
+      posting = true;
+      setState(() {
+
+      });
       await functions
           .httpsCallable('postVideoClipComment')
           .call(<String, dynamic>{
@@ -86,13 +93,22 @@ class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
                   Navigator.popUntil(context, (route) {
                     return count++ == 2;
                   });
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ViewCommentPage(
+                              postID: widget.postID,
+                            )),
+                  );
                 } else {
                   print("error");
                 }
               })
         ],
       ),
-      body: Container(
+      body: (!posting)? Container(
         child: FutureBuilder(
             future: loadVideo(),
             builder: (builder, snapshot) {
@@ -109,6 +125,7 @@ class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
                         ),
                       ),
                       VideoRangeSlider(
+                      postID: widget.postID,
                           chewieController: _chewieController,
                           controller: _timeDurationRange,
                           endTime: (_videoController.value.duration.inSeconds +
@@ -132,7 +149,7 @@ class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
                 return Container();
               }
             }),
-      ),
+      ) : Center(child: CircularProgressIndicator(),),
     );
   }
 }
@@ -141,9 +158,10 @@ class VideoRangeSlider extends StatefulWidget {
   double endTime;
   RangeValues controller;
   ChewieController chewieController;
+  String postID;
 
   VideoRangeSlider(
-      {@required double this.endTime,
+      {@required String postID,@required double this.endTime,
       @required RangeValues this.controller,
       @required ChewieController this.chewieController});
 
@@ -178,7 +196,7 @@ class _VideoRangeSliderState extends State<VideoRangeSlider> {
           ),
         ),
         Text(
-            "Start: ${widget.controller.start.toString()} End: ${widget.controller.end.toString()} Length: ${widget.controller.end - widget.controller.start}"),
+            "Start: ${widget.controller.start.toStringAsFixed(2)} End: ${widget.controller.end.toStringAsFixed(2)} Length: ${(widget.controller.end - widget.controller.start).toStringAsFixed(2)}"),
         RaisedButton(
             child: Text("Trim"),
             onPressed: () {

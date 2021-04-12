@@ -69,15 +69,15 @@ class RegisterPagePassword extends StatelessWidget {
                           listen: false)
                           .getPassword());
                   FirebaseFirestore.instance.collection("groupDB/" +
-                      Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
-                      "/groups").doc('friends').set({'ableForPostPermissionManagement': true});
+                      userCredential.user.uid +
+                      "/groups").doc('friends').set({'ableForPostPermissionManagement': true,'UID':{}});
 
                   FirebaseFirestore.instance.collection("groupDB/" +
-                      Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
+                      userCredential.user.uid +
                       "/groups").doc('waitForAccept').set({'UID':{}});
 
                   FirebaseFirestore.instance.collection("groupDB/" +
-                      Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
+                      userCredential.user.uid +
                       "/groups").doc('waitForTargetUserAccept').set({'UID':{}});
 
                   await user.add({

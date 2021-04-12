@@ -40,9 +40,7 @@ class _PostViewState extends State<PostView> {
 
   Future<bool> loadVideo() async {
     print("Start Initialize");
-    //await _videoController.setLooping(true);
     await _videoController.initialize();
-    //await     _videoController.setLooping(true);
 
     return true;
   }
@@ -111,7 +109,7 @@ class _PostViewState extends State<PostView> {
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
                                           fit: BoxFit.fill,
-                                          image: AssetImage('photo/emptyusericon.jpg'))),
+                                          image: AssetImage('assets/photo/emptyusericon.jpg'))),
                                 );
                               }
                             },
@@ -152,8 +150,13 @@ class _PostViewState extends State<PostView> {
                               _videoController.play();
                               return AspectRatio(
                                 aspectRatio: _videoController.value.aspectRatio,
-                                child: VideoPlayer(_videoController),
+                                child: GestureDetector(onTap: (){
+                                  print("seekTo0");
+                                  _videoController.seekTo(new Duration(milliseconds: 0));
+                                  _videoController.play();
+                                },child: VideoPlayer(_videoController)),
                               );
+
                             } else {
                               return Container();
                             }
@@ -242,7 +245,7 @@ class _PostViewState extends State<PostView> {
                   );
                 }
               } else {
-                return Text("ok");
+                return Container();
               }
             })
         : Container();

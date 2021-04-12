@@ -58,7 +58,7 @@ class _CommentViewState extends State<CommentView> {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             fit: BoxFit.fill,
-                            image: AssetImage('photo/emptyusericon.jpg'))),
+                            image: AssetImage('assets/photo/emptyusericon.jpg'))),
                   );
                 }
               },

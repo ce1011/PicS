@@ -38,13 +38,13 @@ class SettingGroupListPage extends StatelessWidget {
                     context: context,
                     builder: (context) {
                       return AlertDialog(
-                        title: Text("Add user"),
+                        title: Text("Add permission group"),
                         content: TextField(
                           controller: addPermissionGroupTextController,
                         ),
                         actions: [
                           TextButton(
-                            child: Text("Delete"),
+                            child: Text("Add"),
                             onPressed: () async {
                               
                               await firestoreInstance.collection("groupDB/" +

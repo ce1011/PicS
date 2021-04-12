@@ -30,6 +30,7 @@ class _PickImagePageState extends State<PickImagePage> {
   String visiblePermissionPath, ableToCommentForPath;
   bool visibleForPublic = true;
   bool ableToCommentForPublic = true;
+  bool private =false;
   bool videoMode = false;
   File videoPath;
 
@@ -87,6 +88,10 @@ class _PickImagePageState extends State<PickImagePage> {
       permission['visibleFor'] = groupDB.doc(visiblePermissionPath.substring(8));
     }else{
       permission['visibleFor'] = null;
+    }
+    if(private == true){
+      permission['visibleFor'] = null;
+      permission['ableToCommentFor'] = null;
     }
     
     document['permission'] = permission;
@@ -150,12 +155,16 @@ class _PickImagePageState extends State<PickImagePage> {
           child: Column(
             children: [
               Center(
+                  child: (_image == null && _videoController == null)
+                      ? Text("No video/image has selected")
+                      : Container()),
+              Center(
                   child: (_image == null)
-                      ? Text('No image/video selected.')
+                      ? Container()
                       : Image.memory(_image)),
               Center(
                   child: (_videoController == null)
-                      ? Text("NO")
+                      ? Container()
                       : FutureBuilder(
                           future: loadVideo(),
                           builder: (builder, snapshot) {
@@ -192,6 +201,7 @@ class _PickImagePageState extends State<PickImagePage> {
                             onChanged: (String value) {
                               setState(() {
                                 visiblePermissionPath = value;
+                                visibleForPublic = false;
                               });
                             },
                             items: snapshot.data.map<DropdownMenuItem<String>>(
@@ -207,6 +217,7 @@ class _PickImagePageState extends State<PickImagePage> {
                             onChanged: (String value) {
                               setState(() {
                                 ableToCommentForPath = value;
+                                ableToCommentForPublic = false;
                               });
                             },
                             items: snapshot.data.map<DropdownMenuItem<String>>(
@@ -226,6 +237,9 @@ class _PickImagePageState extends State<PickImagePage> {
                 value: visibleForPublic,
                 onChanged: (value) {
                   setState(() {
+                    if(value == true){
+                      visiblePermissionPath = null;
+                    }
                     visibleForPublic = value;
                   });
                 },
@@ -235,7 +249,31 @@ class _PickImagePageState extends State<PickImagePage> {
                 value: ableToCommentForPublic,
                 onChanged: (value) {
                   setState(() {
+                    if(value == true){
+                      ableToCommentForPath = null;
+                    }
                     ableToCommentForPublic = value;
+
+
+                  });
+                },
+              ),
+              Text("Private"),
+              Checkbox(
+                value: private,
+                onChanged: (value) {
+                  setState(() {
+                    if(value == false){
+                      visibleForPublic = true;
+                      ableToCommentForPublic= true;
+                      ableToCommentForPath = null;
+                      private = value;
+                    }else{
+                      visibleForPublic = false;
+                      ableToCommentForPublic= false;
+                      private = value;
+                    }
+
                   });
                 },
               ),

@@ -142,7 +142,7 @@ class ProfileEditPage extends StatelessWidget {
                           shape: BoxShape.circle,
                           image: DecorationImage(
                               fit: BoxFit.fill,
-                              image: AssetImage('photo/emptyusericon.jpg'))),
+                              image: AssetImage('assets/photo/emptyusericon.jpg'))),
 
                     ),                      onTap: () async {
                     await getImageFromGallery();

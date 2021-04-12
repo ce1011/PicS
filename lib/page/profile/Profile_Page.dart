@@ -86,7 +86,7 @@ class ProfilePage extends StatelessWidget {
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
                                                 fit: BoxFit.fill,
-                                                image: AssetImage('photo/emptyusericon.jpg'))),
+                                                image: AssetImage('assets/photo/emptyusericon.jpg'))),
                                       );
                                     }
                                   },
@@ -217,8 +217,7 @@ class ProfilePage extends StatelessWidget {
                                                       .collection("groupDB/" +
                                                           UID +
                                                           "/groups")
-                                                      .doc(
-                                                          "waitForAccept")
+                                                      .doc("waitForAccept")
                                                       .update({
                                                     'UID.' +
                                                         Provider.of<LoginStateNotifier>(
@@ -249,8 +248,7 @@ class ProfilePage extends StatelessWidget {
                                                       .collection("groupDB/" +
                                                           UID +
                                                           "/groups")
-                                                      .doc(
-                                                          "waitForAccept")
+                                                      .doc("waitForAccept")
                                                       .update({
                                                     'UID.' +
                                                         Provider.of<LoginStateNotifier>(

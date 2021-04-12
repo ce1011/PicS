@@ -26,7 +26,10 @@ class _HomePageState extends State<HomePage> {
 
   void onTap(int index) {
     setState(() {
-      selectedHomePage = index;
+      if (selectedHomePage == index) {
+      } else {
+        selectedHomePage = index;
+      }
     });
   }
 
@@ -76,7 +79,8 @@ class _HomePageState extends State<HomePage> {
         children: [
           ListTile(
             leading: FutureBuilder(
-              future: firebaseUserDataAgent.getUserIconURL(Provider.of<LoginStateNotifier>(context, listen: false).UID),
+              future: firebaseUserDataAgent.getUserIconURL(
+                  Provider.of<LoginStateNotifier>(context, listen: false).UID),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return CircleIcon(url: snapshot.data);
@@ -88,7 +92,8 @@ class _HomePageState extends State<HomePage> {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             fit: BoxFit.fill,
-                            image: AssetImage('photo/emptyusericon.jpg'))),
+                            image:
+                                AssetImage('assets/photo/emptyusericon.jpg'))),
                   );
                 }
               },
@@ -117,7 +122,8 @@ class _HomePageState extends State<HomePage> {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ViewWaitForAcceptPage()),
+                MaterialPageRoute(
+                    builder: (context) => ViewWaitForAcceptPage()),
               );
             },
           ),
