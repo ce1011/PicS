@@ -5,6 +5,7 @@ import '../../provider/RegisterInformationContainer.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../provider/LoginStateNotifier.dart';
+import 'Register_Page_Validated.dart';
 
 class RegisterPageProcessing extends StatefulWidget {
   @override
@@ -136,8 +137,7 @@ class _RegisterPageProcessingState extends State<RegisterPageProcessing> {
                           if (pass == true) {
                             Provider.of<LoginStateNotifier>(context, listen: false)
                                 .login(auth.currentUser.uid);
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, '/home', (route) => false);
+                            Navigator.pushReplacement(context,             MaterialPageRoute(builder: (context) => RegisterPageValidated()));
                           }
                         }
 

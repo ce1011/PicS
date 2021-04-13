@@ -142,42 +142,37 @@ class ProfileEditPage extends StatelessWidget {
                           shape: BoxShape.circle,
                           image: DecorationImage(
                               fit: BoxFit.fill,
-                              image: AssetImage('assets/photo/emptyusericon.jpg'))),
-
-                    ),                      onTap: () async {
-                    await getImageFromGallery();
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfileIconCropPage(
-                              photoByte: _image,
-                            )));
-                  },
+                              image: AssetImage(
+                                  'assets/photo/emptyusericon.jpg'))),
+                    ),
+                    onTap: () async {
+                      await getImageFromGallery();
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ProfileIconCropPage(
+                                    photoByte: _image,
+                                  )));
+                    },
                   );
                 }
               },
             ),
-            TextField(
-              controller: userNameInputController,
-              decoration: InputDecoration(
-                labelText: "Username",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: new BorderSide(color: Color(0xFF2308423))),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: new BorderSide(color: Colors.greenAccent[400])),
-              ),
-            ),
-            TextField(
-              controller: displayNameInputController,
-              decoration: InputDecoration(
-                labelText: "Display Name",
-                enabledBorder: OutlineInputBorder(
-                    borderSide: new BorderSide(color: Color(0xFF2308423))),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: new BorderSide(color: Colors.greenAccent[400])),
+            Center(
+              child: TextField(
+                key: UniqueKey(),
+                controller: displayNameInputController,
+                decoration: InputDecoration(
+                  labelText: "Display Name",
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: new BorderSide(color: Color(0xFF2308423))),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: new BorderSide(color: Colors.greenAccent[400])),
+                ),
               ),
             ),
             TextFormField(
+              key: UniqueKey(),
               decoration: const InputDecoration(
                 hintText: 'Description',
               ),

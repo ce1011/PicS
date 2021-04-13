@@ -77,6 +77,7 @@ class _HomePageState extends State<HomePage> {
       drawer: Drawer(
           child: ListView(
         children: [
+
           ListTile(
             leading: FutureBuilder(
               future: firebaseUserDataAgent.getUserIconURL(

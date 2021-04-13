@@ -6,11 +6,13 @@ import '../../firebase/Firebase_User_Data_Agent.dart';
 import 'Setting_Group_List_Edit_Page.dart';
 import '../../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 class SettingGroupListPage extends StatelessWidget {
   FirebaseUserDataAgent firebaseUserDataAgent = FirebaseUserDataAgent();
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
-  TextEditingController addPermissionGroupTextController = TextEditingController();
+  TextEditingController addPermissionGroupTextController =
+      TextEditingController();
 
   QuerySnapshot groupList;
 
@@ -18,10 +20,13 @@ class SettingGroupListPage extends StatelessWidget {
       BuildContext context) async {
     List<QueryDocumentSnapshot> permissionGroupList;
 
-    await firestoreInstance.collection("groupDB/" +
-        Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
-        "/groups").where("visibleInPermissionGroupEditing", isEqualTo: true).get().then((value) => permissionGroupList = value.docs);
-
+    await firestoreInstance
+        .collection("groupDB/" +
+            Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
+            "/groups")
+        .where("visibleInPermissionGroupEditing", isEqualTo: true)
+        .get()
+        .then((value) => permissionGroupList = value.docs);
 
     return permissionGroupList;
   }
@@ -30,52 +35,86 @@ class SettingGroupListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Permission Group Editing"),          actions: [
-          IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text("Add permission group"),
-                        content: TextField(
-                          controller: addPermissionGroupTextController,
-                        ),
-                        actions: [
-                          TextButton(
-                            child: Text("Add"),
-                            onPressed: () async {
-                              
-                              await firestoreInstance.collection("groupDB/" +
-                                  Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
-                                  "/groups").doc(addPermissionGroupTextController.text).set({'visibleInPermissionGroupEditing': true , 'ableForPostPermissionManagement': true});
+          title: Text("Permission Group Editing"),
+          actions: [
+            IconButton(
+                icon: Icon(Icons.add),
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("Add permission group"),
+                          content: TextField(
+                            controller: addPermissionGroupTextController,
+                          ),
+                          actions: [
+                            TextButton(
+                              child: Text("Add"),
+                              onPressed: () async {
+                                await firestoreInstance
+                                    .collection("groupDB/" +
+                                        Provider.of<LoginStateNotifier>(context,
+                                                listen: false)
+                                            .getUID() +
+                                        "/groups")
+                                    .doc(addPermissionGroupTextController.text)
+                                    .set({
+                                  'visibleInPermissionGroupEditing': true,
+                                  'ableForPostPermissionManagement': true,
+                                  'UID': {}
+                                });
 
-
-                              Navigator.of(context).pop();
-                            },
-                          )
-                        ],
-                      );
-                    });
-              })
-        ],
+                                Navigator.of(context).pop();
+                              },
+                            )
+                          ],
+                        );
+                      });
+                })
+          ],
         ),
         body: Container(
             child: StreamBuilder(
-                stream: firestoreInstance.collection("groupDB/" +
-                    Provider.of<LoginStateNotifier>(context, listen: false).getUID() +
-                    "/groups").where("visibleInPermissionGroupEditing", isEqualTo: true).snapshots(),
+                stream: firestoreInstance
+                    .collection("groupDB/" +
+                        Provider.of<LoginStateNotifier>(context, listen: false)
+                            .getUID() +
+                        "/groups")
+                    .where("visibleInPermissionGroupEditing", isEqualTo: true)
+                    .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return Column(
                       children: [
-                        for(var i in snapshot.data.docs) ListTile(title: Text(i.id), onTap: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => SettingGroupListEditPage(groupName: i.id, docsRef: i.reference,)),
-                          );
-                        },)
+                        for (var i in snapshot.data.docs)
+                          Slidable(
+                            actionPane: SlidableDrawerActionPane(),
+                            secondaryActions: [
+                              IconSlideAction(
+                                caption: "Remove",
+                                color: Colors.red,
+                                icon: Icons.delete,
+                                onTap: () {
+      i.reference.delete();
+                                },
+                              )
+                            ],
+                            child: ListTile(
+                              title: Text(i.id),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          SettingGroupListEditPage(
+                                            groupName: i.id,
+                                            docsRef: i.reference,
+                                          )),
+                                );
+                              },
+                            ),
+                          )
                       ],
                     );
                   } else {

@@ -311,8 +311,9 @@ class _ChatPageState extends State<ChatPage> {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             fit: BoxFit.fill,
-                            image: AssetImage('photo/emptyusericon.jpg'))),
+                            image: AssetImage('assets/photo/emptyusericon.jpg'))),
                   );
+                  return Container();
                 }
               },
             ),
@@ -493,6 +494,7 @@ class _ChatPageState extends State<ChatPage> {
                             child: IconButton(
                           icon: Icon(Icons.send),
                           onPressed: () {
+                            print("Text send Click");
                             sendTextMessage(chatTextController.text);
                           },
                         ))

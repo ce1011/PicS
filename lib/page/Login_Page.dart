@@ -1,11 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pics/page/register/Register_Page_Email.dart';
 import 'package:provider/provider.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'register/Register_Page_PhoneNo.dart';
+import 'register/Register_Page_EmailVerify.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 
 class LoginPage extends StatelessWidget {
   final TextEditingController accountInputController =
@@ -18,12 +20,32 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     auth.authStateChanges().listen((User user) {
-      if (user.phoneNumber == null && !auth.currentUser.isAnonymous) {
-        print("No phone");
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),
-            (route) => false);
+      if ((user.phoneNumber == null || user.emailVerified == false) &&
+          !auth.currentUser.isAnonymous) {
+
+
+
+
+        if(kIsWeb){
+          final snackBar = SnackBar(
+              content: Text(
+                  'Your account have not finish the validation process. Please Login on Android/IOS PicS. '));
+          Scaffold.of(context).showSnackBar(snackBar);
+        }else{
+          if (user.emailVerified == false) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RegisterEmailVerifyPage()),
+            );
+            print("No email");
+          } else {
+            print("No phone");
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RegisterPagePhoneNo()),
+            );
+          }
+        }
       } else if (!auth.currentUser.isAnonymous) {
         FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
 
@@ -36,15 +58,21 @@ class LoginPage extends StatelessWidget {
                       .setDisplayName(data.docs[0].data()['displayName']),
                   Provider.of<LoginStateNotifier>(context, listen: false)
                       .setUsername(data.docs[0].data()['username']),
-          Provider.of<LoginStateNotifier>(context, listen: false)
-              .setDescription(data.docs[0].data()['description'])
+                  Provider.of<LoginStateNotifier>(context, listen: false)
+                      .setDescription(data.docs[0].data()['description'])
                 })
             .then((value) =>
                 Provider.of<LoginStateNotifier>(context, listen: false)
                     .login(user.uid))
             .then((value) => Navigator.pushNamedAndRemoveUntil(
                 context, '/home', (route) => false));
-      } else {
+      } else if(auth.currentUser.isAnonymous) {
+        Provider.of<LoginStateNotifier>(context, listen: false)
+            .setDisplayName("Annonymous");
+      Provider.of<LoginStateNotifier>(context, listen: false)
+          .setUsername("Annonymous");
+      Provider.of<LoginStateNotifier>(context, listen: false)
+          .setDescription("Annonymous");
         Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     });
@@ -134,6 +162,7 @@ class LoginPage extends StatelessWidget {
                         ),
                         child: RaisedButton(
                           onPressed: () async {
+                            auth.signOut();
                             try {
                               UserCredential userCredential =
                                   await auth.signInWithEmailAndPassword(
@@ -180,7 +209,7 @@ class LoginPage extends StatelessWidget {
                       Row(
                         children: [
                           Text("Don't have an account?"),
-                          TextButton(
+                          (kIsWeb) ? Text("Register on Android/IOS PicS") :                           TextButton(
                             onPressed: () {
                               Navigator.pushNamed(context, "/register");
                             },

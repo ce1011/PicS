@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../page/Post_Edit_Page.dart';
 import 'Circle_Icon.dart';
@@ -7,6 +8,7 @@ import '../firebase/Firebase_User_Data_Agent.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
 class PostView extends StatefulWidget {
   String username, postID, description;
@@ -34,6 +36,7 @@ class _PostViewState extends State<PostView> {
   FirebaseUserDataAgent userAgent = new FirebaseUserDataAgent();
   bool deleted = false;
   VideoPlayerController _videoController;
+  ChewieController _chewieController;
 
   firebase_storage.FirebaseStorage _storageInstance =
       firebase_storage.FirebaseStorage.instance;
@@ -58,6 +61,14 @@ class _PostViewState extends State<PostView> {
     await _storageInstance.ref('/post/' + postID + '.mp4').getDownloadURL();
 
     _videoController = VideoPlayerController.network(url);
+
+    if(kIsWeb){
+      _chewieController = ChewieController(
+        videoPlayerController: _videoController,
+        autoPlay: false,
+      );
+    }
+
     return url;
   }
 
@@ -70,6 +81,9 @@ class _PostViewState extends State<PostView> {
   @override
   void dispose() {
     // TODO: implement dispose
+    if(kIsWeb){
+_chewieController.dispose();
+    }
     _videoController.dispose();
     super.dispose();
   }
@@ -147,15 +161,27 @@ class _PostViewState extends State<PostView> {
                           future: loadVideo(),
                           builder: (builder, snapshot) {
                             if (snapshot.data == true) {
-                              _videoController.play();
-                              return AspectRatio(
-                                aspectRatio: _videoController.value.aspectRatio,
-                                child: GestureDetector(onTap: (){
-                                  print("seekTo0");
-                                  _videoController.seekTo(new Duration(milliseconds: 0));
-                                  _videoController.play();
-                                },child: VideoPlayer(_videoController)),
-                              );
+                              if(!kIsWeb){
+                                _videoController.play();
+                                return AspectRatio(
+                                  aspectRatio: _videoController.value.aspectRatio,
+                                  child: GestureDetector(onTap: (){
+                                    print("seekTo0");
+                                    _videoController.seekTo(new Duration(milliseconds: 0));
+                                    _videoController.play();
+                                  },child: VideoPlayer(_videoController)),
+                                );
+                              }else{
+                                _chewieController.play();
+
+                                return AspectRatio(
+                                  aspectRatio: _videoController.value.aspectRatio,
+                                  child: GestureDetector(child: Chewie(
+                                    controller: _chewieController,
+                                  ),),
+                                );
+                              }
+
 
                             } else {
                               return Container();

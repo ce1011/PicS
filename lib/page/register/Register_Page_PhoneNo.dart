@@ -4,8 +4,21 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'Register_Page_Processing.dart';
 import '../../provider/RegisterInformationContainer.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class RegisterPagePhoneNo extends StatelessWidget {
+class RegisterPagePhoneNo extends StatefulWidget {
+  @override
+  _RegisterPagePhoneNoState createState() => _RegisterPagePhoneNoState();
+}
+
+class _RegisterPagePhoneNoState extends State<RegisterPagePhoneNo> {
+  FirebaseAuth auth = FirebaseAuth.instance;
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    auth.signOut();
+    super.dispose();
+  }
   final TextEditingController phoneNoInputController =
   new TextEditingController();
   @override
@@ -56,3 +69,4 @@ class RegisterPagePhoneNo extends StatelessWidget {
         ));
   }
 }
+

@@ -130,7 +130,20 @@ class SelectChatPage extends StatelessWidget {
                                               MaterialPageRoute(
                                                   builder: (context) =>
                                                       ChatPage(
-                                                        uid: i.id,
+                                                        uid: (i
+                                                            .data()['UID']
+                                                            .toString()
+                                                            .substring(1, 29) ==
+                                                            Provider.of<LoginStateNotifier>(
+                                                                context,
+                                                                listen: false)
+                                                                .getUID()) ? i
+                                                            .data()['UID']
+                                                            .toString()
+                                                            .substring(37, 65): i
+                                                            .data()['UID']
+                                                            .toString()
+                                                            .substring(1, 29),
                                                         displayName:
                                                             snapshotDisplayName
                                                                 .data,

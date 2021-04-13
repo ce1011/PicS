@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'Circle_Icon.dart';
 import 'dart:typed_data';
@@ -7,6 +8,7 @@ import '../firebase/Firebase_User_Data_Agent.dart';
 import '../provider/LoginStateNotifier.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
 
 class CommentViewVideo extends StatefulWidget {
   String username, iconURL, description, postCreatorUID, commentID, postID;
@@ -20,7 +22,6 @@ class CommentViewVideo extends StatefulWidget {
       @required String postCreatorUID,
       @required String commentID,
       @required postID}) {
-
     this.username = username;
     this.iconURL = iconURL;
     this.commentDate = commentDate;
@@ -28,7 +29,6 @@ class CommentViewVideo extends StatefulWidget {
     this.postCreatorUID = postCreatorUID;
     this.commentID = commentID;
     this.postID = postID;
-
   }
 
   @override
@@ -38,6 +38,7 @@ class CommentViewVideo extends StatefulWidget {
 class _CommentViewVideoState extends State<CommentViewVideo> {
   FirebaseUserDataAgent userAgent = new FirebaseUserDataAgent();
   VideoPlayerController _videoController;
+  ChewieController _chewieController;
 
   firebase_storage.FirebaseStorage _storageInstance =
       firebase_storage.FirebaseStorage.instance;
@@ -56,9 +57,15 @@ class _CommentViewVideoState extends State<CommentViewVideo> {
     print("Start Initialize" + url);
     await _videoController.initialize();
 
+    if (kIsWeb) {
+      _chewieController = ChewieController(
+        videoPlayerController: _videoController,
+        autoPlay: false,
+      );
+    }
+
     return url;
   }
-
 
   @override
   void dispose() {
@@ -124,21 +131,40 @@ class _CommentViewVideoState extends State<CommentViewVideo> {
                 color: Colors.greenAccent[400],
               ),
               Container(
-                  child: FutureBuilder(
-                      future: getPostVideoURL(),
-                      builder: (builder, snapshot) {
-                        if (snapshot.hasData) {
+                  child: GestureDetector(
+                onTap: () {
+                  print("Comment seek to 0");
+                  _videoController.seekTo(new Duration(milliseconds: 0));
+                },
+                child: FutureBuilder(
+                    future: getPostVideoURL(),
+                    builder: (builder, snapshot) {
+                      if (snapshot.hasData) {
+                        if(!kIsWeb){
+                          _videoController.play();
                           return AspectRatio(
                             aspectRatio: _videoController.value.aspectRatio,
                             child: GestureDetector(onTap: (){
-                              print("Comment seek to 0");
+                              print("seekTo0");
                               _videoController.seekTo(new Duration(milliseconds: 0));
+                              _videoController.play();
                             },child: VideoPlayer(_videoController)),
                           );
-                        } else {
-                          return Container();
+                        }else{
+                          _chewieController.play();
+
+                          return AspectRatio(
+                            aspectRatio: _videoController.value.aspectRatio,
+                            child: GestureDetector(child: Chewie(
+                              controller: _chewieController,
+                            ),),
+                          );
                         }
-                      })),
+                      } else {
+                        return Container();
+                      }
+                    }),
+              )),
               Container(
                 padding: EdgeInsets.only(left: 20.0, top: 10.0, right: 20.0),
                 child: Text(widget.description),
@@ -206,6 +232,8 @@ class _CommentViewVideoState extends State<CommentViewVideo> {
               ))
             ],
           )
-        : Center(child: CircularProgressIndicator(),);
+        : Center(
+            child: CircularProgressIndicator(),
+          );
   }
 }

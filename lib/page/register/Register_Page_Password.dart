@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:pics/page/register/Register_Page_PhoneNo.dart';
+import 'package:pics/page/register/Register_Page_EmailVerify.dart';
 import '../../provider/RegisterInformationContainer.dart';
 import '../../provider/LoginStateNotifier.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -80,6 +80,8 @@ class RegisterPagePassword extends StatelessWidget {
                       userCredential.user.uid +
                       "/groups").doc('waitForTargetUserAccept').set({'UID':{}});
 
+                  await userCredential.user.sendEmailVerification();
+
                   await user.add({
                     'UID': userCredential.user.uid,
                     'displayName': Provider.of<RegisterInformationContainer>(
@@ -103,12 +105,7 @@ class RegisterPagePassword extends StatelessWidget {
                           .setUsername(
                           Provider.of<RegisterInformationContainer>(context,
                               listen: false)
-                              .getName())).then((value) =>
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegisterPagePhoneNo()),
-                      ));
+                              .getName()));
                 },
               ),
             )
