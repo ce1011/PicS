@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
@@ -230,8 +231,10 @@ class _VideoRangeSliderState extends State<VideoRangeSlider> {
                         });
               };
 
-              widget.chewieController.videoPlayerController
-                  .addListener(pauseClip);
+              if(!kIsWeb){
+                widget.chewieController.videoPlayerController.addListener(pauseClip);
+              }
+
 
               print("Start: " + startTime.toString());
               print("End: " + endTime.toString());

@@ -84,11 +84,10 @@ class _ProfileIconCropPageState extends State<ProfileIconCropPage> {
           color: Colors.black,
           padding: const EdgeInsets.all(20.0),
           child: Container(
-            padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
             child: Crop(
               key: cropKey,
               image: MemoryImage(widget.photoByte),
-              maximumScale: 1.0,
+              maximumScale: 2.0,
             ),
           )),
     );
