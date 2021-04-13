@@ -61,7 +61,7 @@ class _SettingGroupListEditPageState extends State<SettingGroupListEditPage> {
                           ),
                           actions: [
                             TextButton(
-                              child: Text("Delete"),
+                              child: Text("Add"),
                               onPressed: () async {
                                 var uid = await firebaseUserDataAgent
                                     .getUIDByUsername(

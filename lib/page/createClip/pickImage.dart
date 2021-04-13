@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
@@ -35,8 +36,15 @@ class _PickImagePageState extends State<PickImagePage> {
   File videoPath;
 
   Future getImageFromGallery() async {
-    FilePickerResult result = await FilePicker.platform
-        .pickFiles(type: FileType.media, withData: true);
+    FilePickerResult result;
+    if(kIsWeb){
+      result = await FilePicker.platform
+          .pickFiles(type: FileType.custom, withData: true, allowedExtensions: ['jpg','png'],);
+    }else{
+      result = await FilePicker.platform
+          .pickFiles(type: FileType.custom, withData: true, allowedExtensions: ['jpg','png','mp4']);
+    }
+
 
     if (result != null) {
       PlatformFile file = result.files.first;

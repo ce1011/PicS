@@ -354,7 +354,7 @@ class _ChatPageState extends State<ChatPage> {
                           builder: (context, snapshot) {
                             lastIndex =
                                 snapshot.data.docs.last.data()['chatContentID'];
-                            return snapshot.hasData
+                            return (snapshot.hasData && snapshot.data.size != 0)
                                 ? Column(
                                     children: [
                                       for (var i in snapshot.data.docs)

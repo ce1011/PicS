@@ -52,6 +52,9 @@ class ProfilePage extends StatelessWidget {
           future: userAgent.getUserName(UID),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
+              print("Target UID: " + UID + " Own UID: " +   Provider.of<LoginStateNotifier>(context,
+                  listen: false)
+                  .getUID());
               return Text(snapshot.data);
             } else {
               return Text("");
@@ -229,31 +232,33 @@ class ProfilePage extends StatelessWidget {
                                                 },
                                               );
                                             } else {
-                                              return RaisedButton(
+                                              return (UID == Provider.of<LoginStateNotifier>(context,
+                                                  listen: false)
+                                                  .getUID()) ? Container() : RaisedButton(
                                                 child: Text("Add Friends"),
                                                 onPressed: () {
                                                   firestoreInstance
                                                       .collection("groupDB/" +
-                                                          Provider.of<LoginStateNotifier>(
-                                                                  context,
-                                                                  listen: false)
-                                                              .getUID() +
-                                                          "/groups")
+                                                      Provider.of<LoginStateNotifier>(
+                                                          context,
+                                                          listen: false)
+                                                          .getUID() +
+                                                      "/groups")
                                                       .doc(
-                                                          "waitForTargetUserAccept")
+                                                      "waitForTargetUserAccept")
                                                       .update(
-                                                          {'UID.' + UID: true});
+                                                      {'UID.' + UID: true});
 
                                                   firestoreInstance
                                                       .collection("groupDB/" +
-                                                          UID +
-                                                          "/groups")
+                                                      UID +
+                                                      "/groups")
                                                       .doc("waitForAccept")
                                                       .update({
                                                     'UID.' +
                                                         Provider.of<LoginStateNotifier>(
-                                                                context,
-                                                                listen: false)
+                                                            context,
+                                                            listen: false)
                                                             .getUID(): true
                                                   });
                                                 },
