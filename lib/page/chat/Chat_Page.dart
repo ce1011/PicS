@@ -16,6 +16,7 @@ import 'package:link/link.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
+import 'VideoCall.dart';
 
 import 'dart:typed_data';
 
@@ -327,7 +328,12 @@ class _ChatPageState extends State<ChatPage> {
             ),
             IconButton(
               icon: Icon(Icons.video_call),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => VideoCallPage(Provider.of<LoginStateNotifier>(context, listen: false).getUID(),widget.uid)),
+                );
+              },
             )
           ],
         ),

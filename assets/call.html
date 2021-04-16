@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link href="./style.css" rel="stylesheet"/>
+    </head>
+    <body>
+        <script src="./peerjs.js"></script>
+        <H1>In html</H1>
+        <video class="secondary-video" autoplay id="remote-video"></video>
+        <video class="primary-video" autoplay muted id="local-video"></video>
+
+        <script src="./call.js"></script>
+        <script>
+            window.addEventListener("flutterInAppWebViewPlatformReady", function(event){
+                window.flutter_inappwebview.callHandler('getVideoCallContent').then((result)=>{
+                    console.log("Receive data from dart, the data is: " + JSON.stringify(result));
+
+                    init(result['UID']);
+                    
+                    startCall(result['targetUID']);
+                })
+            })
+
+        </script>
+    </body>
+
+
+</html>
+
