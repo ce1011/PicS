@@ -23,11 +23,10 @@ import 'dart:typed_data';
 class ChatPage extends StatefulWidget {
   String uid, displayName, chatDocumentID;
 
-  ChatPage(
-      {Key key,
-      @required this.uid,
-      @required this.displayName,
-      @required this.chatDocumentID})
+  ChatPage({Key key,
+    @required this.uid,
+    @required this.displayName,
+    @required this.chatDocumentID})
       : super(key: key);
 
   @override
@@ -35,7 +34,6 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-
   Uint8List _image;
   File _file;
   int lastIndex;
@@ -95,17 +93,17 @@ class _ChatPageState extends State<ChatPage> {
     try {
       await storageInstance
           .ref('chat/' +
-              widget.chatDocumentID +
-              '/' +
-              (temp_lastIndex + 1).toString() +
-              '.jpg')
+          widget.chatDocumentID +
+          '/' +
+          (temp_lastIndex + 1).toString() +
+          '.jpg')
           .putData(photo);
       await chatContentCollection.add({
         'chatContentID': temp_lastIndex + 1,
         'contentType': 1,
         'sendAt': new Timestamp.now(),
         'sendBy':
-            Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+        Provider.of<LoginStateNotifier>(context, listen: false).getUID()
       });
     } on FirebaseException catch (e) {
       print("Error");
@@ -128,17 +126,17 @@ class _ChatPageState extends State<ChatPage> {
     try {
       await storageInstance
           .ref('chat/' +
-              widget.chatDocumentID +
-              '/' +
-              (temp_lastIndex + 1).toString() +
-              '.aac')
+          widget.chatDocumentID +
+          '/' +
+          (temp_lastIndex + 1).toString() +
+          '.aac')
           .putFile(file);
       await chatContentCollection.add({
         'chatContentID': temp_lastIndex + 1,
         'contentType': 3,
         'sendAt': new Timestamp.now(),
         'sendBy':
-            Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+        Provider.of<LoginStateNotifier>(context, listen: false).getUID()
       });
     } on FirebaseException catch (e) {
       print("Error");
@@ -159,11 +157,11 @@ class _ChatPageState extends State<ChatPage> {
     try {
       await storageInstance
           .ref('chat/' +
-              widget.chatDocumentID +
-              '/' +
-              (temp_lastIndex + 1).toString() +
-              '/' +
-              filename)
+          widget.chatDocumentID +
+          '/' +
+          (temp_lastIndex + 1).toString() +
+          '/' +
+          filename)
           .putData(file);
       await chatContentCollection.add({
         'chatContentID': temp_lastIndex + 1,
@@ -171,8 +169,45 @@ class _ChatPageState extends State<ChatPage> {
         'content': filename,
         'sendAt': new Timestamp.now(),
         'sendBy':
-            Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+        Provider.of<LoginStateNotifier>(context, listen: false).getUID()
       });
+    } on FirebaseException catch (e) {
+      print("Error");
+    }
+  }
+
+  Future<void> sendVideoCallInvitation() async {
+    int temp_lastIndex;
+    if (lastIndex == null) {
+      temp_lastIndex = -1;
+    } else {
+      temp_lastIndex = lastIndex;
+    }
+
+    CollectionReference chatContentCollection = firestoreInstance
+        .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
+
+    try {
+      await chatContentCollection.add({
+        'chatContentID': temp_lastIndex + 1,
+        'contentType': 4,
+        'result': 'unknown',
+        'sendAt': new Timestamp.now(),
+        'sendBy':
+        Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+      }).then((value) =>
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    VideoCallPage(
+                      Provider.of<LoginStateNotifier>(context,
+                          listen: false)
+                          .getUID(),
+                      0, watchChatContentDocument: value,
+                      targetUID: widget.uid,)),
+          )
+      );
     } on FirebaseException catch (e) {
       print("Error");
     }
@@ -228,6 +263,67 @@ class _ChatPageState extends State<ChatPage> {
                 }
               });
         }
+      case 4:
+        {
+          return Container(
+            child: Column(
+              children: [
+                Text("Video Call Acceptation"),
+                RaisedButton(
+                    onPressed: () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                VideoCallPage(
+                                    Provider.of<LoginStateNotifier>(context,
+                                        listen: false)
+                                        .getUID(),
+                                    1)),
+                      );
+
+                      Future.delayed(new Duration(seconds: 1, milliseconds: 500), (){
+                        firestoreInstance
+                            .collection("chatroom/" +
+                            widget.chatDocumentID +
+                            "/chatContent")
+                            .where('chatContentID', isEqualTo: chatContentID)
+                            .get()
+                            .then((value) =>
+                            firestoreInstance
+                                .collection("chatroom/" +
+                                widget.chatDocumentID +
+                                "/chatContent")
+                                .doc(value.docs.first.id)
+                                .update({'result': 'accept'}));
+                      });
+
+
+
+                    },
+                    child: Text("Accept")),
+                RaisedButton(
+                  onPressed: () async {
+                    await firestoreInstance
+                        .collection("chatroom/" +
+                        widget.chatDocumentID +
+                        "/chatContent")
+                        .where('chatContentID', isEqualTo: chatContentID)
+                        .get()
+                        .then((value) =>
+                        firestoreInstance
+                            .collection("chatroom/" +
+                            widget.chatDocumentID +
+                            "/chatContent")
+                            .doc(value.docs.first.id)
+                            .update({'result': 'decline'}));
+                  },
+                  child: Text("Decline"),
+                )
+              ],
+            ),
+          );
+        }
     }
   }
 
@@ -235,10 +331,10 @@ class _ChatPageState extends State<ChatPage> {
     String url;
     url = await storageInstance
         .ref('chat/' +
-            widget.chatDocumentID +
-            '/' +
-            chatContentID.toString() +
-            '.jpg')
+        widget.chatDocumentID +
+        '/' +
+        chatContentID.toString() +
+        '.jpg')
         .getDownloadURL();
     return url;
   }
@@ -247,11 +343,11 @@ class _ChatPageState extends State<ChatPage> {
     String url;
     url = await storageInstance
         .ref('chat/' +
-            widget.chatDocumentID +
-            '/' +
-            chatContentID.toString() +
-            '/' +
-            filename)
+        widget.chatDocumentID +
+        '/' +
+        chatContentID.toString() +
+        '/' +
+        filename)
         .getDownloadURL();
     return url;
   }
@@ -260,10 +356,10 @@ class _ChatPageState extends State<ChatPage> {
     String url;
     url = await storageInstance
         .ref('chat/' +
-            widget.chatDocumentID +
-            '/' +
-            chatContentID.toString() +
-            '.aac')
+        widget.chatDocumentID +
+        '/' +
+        chatContentID.toString() +
+        '.aac')
         .getDownloadURL();
     return url;
   }
@@ -312,7 +408,8 @@ class _ChatPageState extends State<ChatPage> {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                             fit: BoxFit.fill,
-                            image: AssetImage('assets/photo/emptyusericon.jpg'))),
+                            image:
+                            AssetImage('assets/photo/emptyusericon.jpg'))),
                   );
                   return Container();
                 }
@@ -329,22 +426,37 @@ class _ChatPageState extends State<ChatPage> {
             IconButton(
               icon: Icon(Icons.video_call),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => VideoCallPage(Provider.of<LoginStateNotifier>(context, listen: false).getUID(),widget.uid)),
-                );
+                sendVideoCallInvitation();
               },
             )
           ],
         ),
         body: Container(
             padding: EdgeInsets.only(
-              left: (MediaQuery.of(context).size.width >= 1080.0)
-                  ? (MediaQuery.of(context).size.width) * 0.25
-                  : (MediaQuery.of(context).size.width) * 0.0,
-              right: (MediaQuery.of(context).size.width >= 1080.0)
-                  ? (MediaQuery.of(context).size.width) * 0.25
-                  : (MediaQuery.of(context).size.width) * 0.0,
+              left: (MediaQuery
+                  .of(context)
+                  .size
+                  .width >= 1080.0)
+                  ? (MediaQuery
+                  .of(context)
+                  .size
+                  .width) * 0.25
+                  : (MediaQuery
+                  .of(context)
+                  .size
+                  .width) * 0.0,
+              right: (MediaQuery
+                  .of(context)
+                  .size
+                  .width >= 1080.0)
+                  ? (MediaQuery
+                  .of(context)
+                  .size
+                  .width) * 0.25
+                  : (MediaQuery
+                  .of(context)
+                  .size
+                  .width) * 0.0,
             ),
             child: Column(children: [
               Expanded(
@@ -353,58 +465,60 @@ class _ChatPageState extends State<ChatPage> {
                       child: StreamBuilder<QuerySnapshot>(
                           stream: firestoreInstance
                               .collection("chatroom/" +
-                                  widget.chatDocumentID +
-                                  "/chatContent")
+                              widget.chatDocumentID +
+                              "/chatContent")
                               .orderBy('sendAt')
                               .limitToLast(15)
                               .snapshots(),
                           builder: (context, snapshot) {
                             lastIndex =
-                                snapshot.data.docs.last.data()['chatContentID'];
+                            snapshot.data.docs.last.data()['chatContentID'];
                             return (snapshot.hasData && snapshot.data.size != 0)
                                 ? Column(
-                                    children: [
-                                      for (var i in snapshot.data.docs)
-                                        ChatBubble(
-                                            clipper: (i.data()['sendBy'] ==
-                                                    Provider.of<LoginStateNotifier>(context, listen: false)
-                                                        .getUID())
-                                                ? ChatBubbleClipper1(
-                                                    type: BubbleType.sendBubble)
-                                                : ChatBubbleClipper1(
-                                                    type: BubbleType
-                                                        .receiverBubble),
-                                            alignment: (i.data()['sendBy'] ==
-                                                    Provider.of<LoginStateNotifier>(
-                                                            context,
-                                                            listen: false)
-                                                        .getUID())
-                                                ? Alignment.topRight
-                                                : Alignment.topLeft,
-                                            margin: EdgeInsets.only(top: 20),
-                                            backGroundColor: (i.data()['sendBy'] ==
-                                                    Provider.of<LoginStateNotifier>(
-                                                            context,
-                                                            listen: false)
-                                                        .getUID())
-                                                ? Colors.blue
-                                                : Colors.purple,
-                                            child: Container(
-                                              constraints: BoxConstraints(
-                                                maxWidth: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.7,
-                                              ),
-                                              child: chatBubbleContent(
-                                                i.data()['contentType'],
-                                                content: i.data()['content'],
-                                                chatContentID:
-                                                    i.data()['chatContentID'],
-                                              ),
-                                            )),
-                                    ],
-                                  )
+                              children: [
+                                for (var i in snapshot.data.docs)
+                                  ChatBubble(
+                                      clipper: (i.data()['sendBy'] ==
+                                          Provider.of<LoginStateNotifier>(
+                                              context, listen: false)
+                                              .getUID())
+                                          ? ChatBubbleClipper1(
+                                          type: BubbleType.sendBubble)
+                                          : ChatBubbleClipper1(
+                                          type: BubbleType
+                                              .receiverBubble),
+                                      alignment: (i.data()['sendBy'] ==
+                                          Provider.of<LoginStateNotifier>(
+                                              context,
+                                              listen: false)
+                                              .getUID())
+                                          ? Alignment.topRight
+                                          : Alignment.topLeft,
+                                      margin: EdgeInsets.only(top: 20),
+                                      backGroundColor: (i.data()['sendBy'] ==
+                                          Provider.of<LoginStateNotifier>(
+                                              context,
+                                              listen: false)
+                                              .getUID())
+                                          ? Colors.blue
+                                          : Colors.purple,
+                                      child: Container(
+                                        constraints: BoxConstraints(
+                                          maxWidth: MediaQuery
+                                              .of(context)
+                                              .size
+                                              .width *
+                                              0.7,
+                                        ),
+                                        child: chatBubbleContent(
+                                          i.data()['contentType'],
+                                          content: i.data()['content'],
+                                          chatContentID:
+                                          i.data()['chatContentID'],
+                                        ),
+                                      )),
+                              ],
+                            )
                                 : Container();
                           }))),
               Divider(
@@ -442,68 +556,72 @@ class _ChatPageState extends State<ChatPage> {
                         ),
                         Expanded(
                             child: PopupMenuButton(
-                          icon: Icon(Icons.attach_file),
-                          itemBuilder: (context) {
-                            var messageType = List<PopupMenuEntry<Object>>();
-                            messageType.add(PopupMenuItem(
-                              child: Text("Photo/Video"),
-                              value: 1,
-                            ));
-                            messageType.add(PopupMenuItem(
-                              child: Text("File"),
-                              value: 2,
-                            ));
-                            return messageType;
-                          },
-                          onSelected: (value) async {
-                            switch (value) {
-                              case 1:
-                                {
-                                  print("ok");
-                                  FilePickerResult result =
+                              icon: Icon(Icons.attach_file),
+                              itemBuilder: (context) {
+                                var messageType = List<
+                                    PopupMenuEntry<Object>>();
+                                messageType.add(PopupMenuItem(
+                                  child: Text("Photo/Video"),
+                                  value: 1,
+                                ));
+                                messageType.add(PopupMenuItem(
+                                  child: Text("File"),
+                                  value: 2,
+                                ));
+                                return messageType;
+                              },
+                              onSelected: (value) async {
+                                switch (value) {
+                                  case 1:
+                                    {
+                                      print("ok");
+                                      FilePickerResult result =
                                       await FilePicker.platform.pickFiles(
                                           type: FileType.image, withData: true);
 
-                                  setState(() {
-                                    if (result != null) {
-                                      PlatformFile file = result.files.first;
-                                      sendPhotoMessage(file.bytes);
-                                    } else {
-                                      print('No image selected.');
+                                      setState(() {
+                                        if (result != null) {
+                                          PlatformFile file = result.files
+                                              .first;
+                                          sendPhotoMessage(file.bytes);
+                                        } else {
+                                          print('No image selected.');
+                                        }
+                                      });
+
+                                      break;
                                     }
-                                  });
 
-                                  break;
-                                }
-
-                              case 2:
-                                {
-                                  FilePickerResult result =
+                                  case 2:
+                                    {
+                                      FilePickerResult result =
                                       await FilePicker.platform.pickFiles(
                                           type: FileType.any, withData: true);
 
-                                  setState(() {
-                                    if (result != null) {
-                                      PlatformFile file = result.files.first;
-                                      sendFileMessage(file.bytes, file.name);
-                                    } else {
-                                      print('No image selected.');
-                                    }
-                                  });
+                                      setState(() {
+                                        if (result != null) {
+                                          PlatformFile file = result.files
+                                              .first;
+                                          sendFileMessage(
+                                              file.bytes, file.name);
+                                        } else {
+                                          print('No image selected.');
+                                        }
+                                      });
 
-                                  break;
+                                      break;
+                                    }
                                 }
-                            }
-                          },
-                        )),
+                              },
+                            )),
                         Expanded(
                             child: IconButton(
-                          icon: Icon(Icons.send),
-                          onPressed: () {
-                            print("Text send Click");
-                            sendTextMessage(chatTextController.text);
-                          },
-                        ))
+                              icon: Icon(Icons.send),
+                              onPressed: () {
+                                print("Text send Click");
+                                sendTextMessage(chatTextController.text);
+                              },
+                            ))
                       ],
                     ),
                   ))
