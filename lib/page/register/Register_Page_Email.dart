@@ -6,15 +6,26 @@ import 'package:provider/provider.dart';
 import '../../provider/RegisterInformationContainer.dart';
 
 class RegisterPageEmail extends StatelessWidget {
+  bool validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    return (!regex.hasMatch(value)) ? false : true;
+  }
+
   final TextEditingController emailInputController =
-  new TextEditingController();
+      new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("Create Account")),
         body: Column(
           children: [
-            Text("Let us know your email", style: TextStyle(fontSize: 24),),
+            Text(
+              "Let us know your email",
+              style: TextStyle(fontSize: 24),
+            ),
             Container(
                 width: 200,
                 height: 200,
@@ -42,10 +53,30 @@ class RegisterPageEmail extends StatelessWidget {
                             new BorderSide(color: Colors.greenAccent[400])),
                   ),
                 )),
-            Container(child: RaisedButton(child: Text("Next"), onPressed: (){
-              Provider.of<RegisterInformationContainer>(context, listen: false).setEmail(emailInputController.text);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPageName()),);
-            },),)
+            Builder(
+
+              builder: (context)=>Container(
+                child: RaisedButton(
+                  child: Text("Next"),
+                  onPressed: () {
+                    if (!validateEmail(emailInputController.text)) {
+                      final snackBar =
+                          SnackBar(content: Text('The email is not valid.'));
+                      Scaffold.of(context).showSnackBar(snackBar);
+                    } else {
+                      Provider.of<RegisterInformationContainer>(context,
+                              listen: false)
+                          .setEmail(emailInputController.text);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RegisterPageName()),
+                      );
+                    }
+                  },
+                ),
+              ),
+            )
           ],
           mainAxisAlignment: MainAxisAlignment.center,
         ));

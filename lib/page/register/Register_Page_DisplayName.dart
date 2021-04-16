@@ -45,13 +45,22 @@ class RegisterPageDisplayName extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              child: RaisedButton(
-                child: Text("Next"),
-                onPressed: () {
-                  Provider.of<RegisterInformationContainer>(context, listen: false).setDisplayName(displayNameInputController.text);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPagePassword()),);
-                },
+            Builder(
+              builder: (context)=>Container(
+                child: RaisedButton(
+                  child: Text("Next"),
+                  onPressed: () {
+                    if(displayNameInputController.text == ""){
+                      final snackBar =
+                      SnackBar(content: Text('Display name couid not be empty.'));
+                      Scaffold.of(context).showSnackBar(snackBar);
+                    }else{
+                      Provider.of<RegisterInformationContainer>(context, listen: false).setDisplayName(displayNameInputController.text);
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPagePassword()),);
+                    }
+
+                  },
+                ),
               ),
             )
           ],

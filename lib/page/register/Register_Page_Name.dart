@@ -3,10 +3,11 @@ import 'package:flare_flutter/flare_actor.dart';
 import 'package:pics/page/register/Register_Page_DisplayName.dart';
 import 'package:provider/provider.dart';
 import '../../provider/RegisterInformationContainer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegisterPageName extends StatelessWidget {
-  final TextEditingController nameInputController =
-  new TextEditingController();
+  final TextEditingController nameInputController = new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,13 +46,42 @@ class RegisterPageName extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              child: RaisedButton(
-                child: Text("Next"),
-                onPressed: () {
-                  Provider.of<RegisterInformationContainer>(context, listen: false).setName(nameInputController.text);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPageDisplayName()),);
-                },
+            Builder(
+              builder: (context)=> Container(
+                child: RaisedButton(
+                  child: Text("Next"),
+                  onPressed: () async {
+
+                    if(nameInputController.text == ""){
+                      final snackBar =
+                      SnackBar(content: Text('Username couid not be empty.'));
+                      Scaffold.of(context).showSnackBar(snackBar);
+                    }else{
+                      QuerySnapshot sameUsername;
+                      CollectionReference user =
+                      FirebaseFirestore.instance.collection("user");
+                      
+                      await user.where('username', isEqualTo: nameInputController.text).get().then((value) => sameUsername = value);
+
+                      if(sameUsername.size == 0){
+                        Provider.of<RegisterInformationContainer>(context,
+                            listen: false)
+                            .setName(nameInputController.text);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RegisterPageDisplayName()),
+                        );
+                      }else{
+                        final snackBar =
+                        SnackBar(content: Text('This username have been chosen by another user.'));
+                        Scaffold.of(context).showSnackBar(snackBar);
+                      }
+
+                    }
+
+                  },
+                ),
               ),
             )
           ],
