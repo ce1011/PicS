@@ -12,6 +12,7 @@ class Routes {
     router.define("/home",
         handler: homeHandler, transitionType: TransitionType.inFromBottom);
     router.define("/post/:postID/comment", handler: viewCommentHandler);
+    router.define("/post/:postID", handler: viewPostHandler);
     router.define("/register", handler: registerHandler);
     router.define("/profile/:uid", handler: profileHandler);
   }

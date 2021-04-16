@@ -12,6 +12,13 @@ class RegisterPagePassword extends StatelessWidget {
   final TextEditingController passwordInputController =
   new TextEditingController();
 
+  bool checkPasswordPattern(String password){
+    Pattern pattern =
+        r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$';
+    RegExp regex = new RegExp(pattern);
+    return (!regex.hasMatch(password)) ? false : true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,6 +26,11 @@ class RegisterPagePassword extends StatelessWidget {
         body: Column(
           children: [
             Text("Tell us the password", style: TextStyle(fontSize: 24)),
+            Text("The password must contain:"),
+          Text("At least 1 Uppercase letter"),
+            Text("At least 1 Lowercase letter"),
+            Text("At least 1 numeric letter"),
+            Text("At least 8 char long"),
             Container(
                 width: 200,
                 height: 200,
@@ -47,66 +59,77 @@ class RegisterPagePassword extends StatelessWidget {
                 ),
               ),
             ),
-            Container(
-              child: RaisedButton(
-                child: Text("Next"),
-                onPressed: () async {
-                  Provider.of<RegisterInformationContainer>(context,
-                      listen: false)
-                      .setPassword(passwordInputController.text);
+            Builder(
+              builder: (context)=>Container(
+                child: RaisedButton(
+                  child: Text("Next"),
+                  onPressed: () async {
 
-                  CollectionReference user =
-                  FirebaseFirestore.instance.collection("user");
-
-                  UserCredential userCredential = await FirebaseAuth.instance
-                      .createUserWithEmailAndPassword(
-                      email: Provider.of<RegisterInformationContainer>(
-                          context,
+                    if(!checkPasswordPattern(passwordInputController.text)){
+                      final snackBar =
+                      SnackBar(content: Text('The password is not match with requirment.'));
+                      Scaffold.of(context).showSnackBar(snackBar);
+                    }else{
+                      Provider.of<RegisterInformationContainer>(context,
                           listen: false)
-                          .getEmail(),
-                      password: Provider.of<RegisterInformationContainer>(
-                          context,
-                          listen: false)
-                          .getPassword());
-                  FirebaseFirestore.instance.collection("groupDB/" +
-                      userCredential.user.uid +
-                      "/groups").doc('friends').set({'ableForPostPermissionManagement': true,'UID':{}});
+                          .setPassword(passwordInputController.text);
 
-                  FirebaseFirestore.instance.collection("groupDB/" +
-                      userCredential.user.uid +
-                      "/groups").doc('waitForAccept').set({'UID':{}});
+                      CollectionReference user =
+                      FirebaseFirestore.instance.collection("user");
 
-                  FirebaseFirestore.instance.collection("groupDB/" +
-                      userCredential.user.uid +
-                      "/groups").doc('waitForTargetUserAccept').set({'UID':{}});
-
-                  await userCredential.user.sendEmailVerification();
-
-                  await user.add({
-                    'UID': userCredential.user.uid,
-                    'displayName': Provider.of<RegisterInformationContainer>(
-                        context,
-                        listen: false)
-                        .getDisplayName(),
-                    'username': Provider.of<RegisterInformationContainer>(
-                        context,
-                        listen: false)
-                        .getName(),
-                    'description': ""
-                  }).then(
-                          (value) =>
-                          Provider.of<LoginStateNotifier>(context,
+                      UserCredential userCredential = await FirebaseAuth.instance
+                          .createUserWithEmailAndPassword(
+                          email: Provider.of<RegisterInformationContainer>(
+                              context,
                               listen: false)
-                              .setDisplayName(
+                              .getEmail(),
+                          password: Provider.of<RegisterInformationContainer>(
+                              context,
+                              listen: false)
+                              .getPassword());
+                      FirebaseFirestore.instance.collection("groupDB/" +
+                          userCredential.user.uid +
+                          "/groups").doc('friends').set({'ableForPostPermissionManagement': true,'UID':{}});
+
+                      FirebaseFirestore.instance.collection("groupDB/" +
+                          userCredential.user.uid +
+                          "/groups").doc('waitForAccept').set({'UID':{}});
+
+                      FirebaseFirestore.instance.collection("groupDB/" +
+                          userCredential.user.uid +
+                          "/groups").doc('waitForTargetUserAccept').set({'UID':{}});
+
+                      await userCredential.user.sendEmailVerification();
+
+                      await user.add({
+                        'UID': userCredential.user.uid,
+                        'displayName': Provider.of<RegisterInformationContainer>(
+                            context,
+                            listen: false)
+                            .getDisplayName(),
+                        'username': Provider.of<RegisterInformationContainer>(
+                            context,
+                            listen: false)
+                            .getName(),
+                        'description': ""
+                      }).then(
+                              (value) =>
+                              Provider.of<LoginStateNotifier>(context,
+                                  listen: false)
+                                  .setDisplayName(
+                                  Provider.of<RegisterInformationContainer>(context,
+                                      listen: false)
+                                      .getDisplayName())).then((value) =>
+                          Provider.of<LoginStateNotifier>(context, listen: false)
+                              .setUsername(
                               Provider.of<RegisterInformationContainer>(context,
                                   listen: false)
-                                  .getDisplayName())).then((value) =>
-                      Provider.of<LoginStateNotifier>(context, listen: false)
-                          .setUsername(
-                          Provider.of<RegisterInformationContainer>(context,
-                              listen: false)
-                              .getName()));
-                },
+                                  .getName()));
+                    }
+
+
+                  },
+                ),
               ),
             )
           ],

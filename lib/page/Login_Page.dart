@@ -138,6 +138,7 @@ class LoginPage extends StatelessWidget {
                               bottom:
                                   (MediaQuery.of(context).size.height) * 0.01),
                           child: TextField(
+                            obscureText: true,
                             key: ObjectKey("password"),
                             controller: passwordInputController,
                             decoration: InputDecoration(
