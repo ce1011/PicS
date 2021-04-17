@@ -30,7 +30,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
         print(event.data().toString());
         if (event.data()['result'] == "accept") {
           print("accept");
-          //_webViewController.evaluateJavascript(source: "startCall('" + widget.targetUID + "')");
+          _webViewController.evaluateJavascript(source: "startCall('" + widget.targetUID + "')");
         }
       });
     }
