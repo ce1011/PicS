@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pics/page/comment/View_Comment_Page.dart';
 import '../page/Post_Edit_Page.dart';
 import 'Circle_Icon.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
@@ -13,19 +14,20 @@ import 'package:chewie/chewie.dart';
 class PostView extends StatefulWidget {
   String username, postID, description;
   Timestamp postDate;
-  bool videoMode;
+  bool videoMode, canComment;
 
   PostView(
       {@required username,
       @required Timestamp postDate,
       @required String postID,
       @required String description,
-      @required bool videoMode}) {
+      @required bool videoMode, @required bool canComment}) {
     this.username = username;
     this.postDate = postDate;
     this.postID = postID;
     this.description = description;
     this.videoMode = videoMode;
+    this.canComment = canComment;
   }
 
   @override
@@ -96,7 +98,7 @@ _chewieController.dispose();
 
   @override
   Widget build(BuildContext context) {
-    print(widget.postID + " " + widget.videoMode.toString());
+    print("PostView Build state Allow for comment  " + widget.canComment.toString());
     return !deleted
         ? FutureBuilder(
             future: (widget.videoMode == false) ? getPostImageURL(widget.postID) : getPostVideoURL(widget.postID) ,
@@ -200,7 +202,7 @@ _chewieController.dispose();
                             icon: Icon(Icons.comment),
                             onPressed: () {
                               Navigator.pushNamed(
-                                  context, "/post/${widget.postID}/comment");
+                                  context, "/post/${widget.postID}/comment", arguments: CommentArguments(widget.canComment));
                             },
                           ),
                           (widget.username ==

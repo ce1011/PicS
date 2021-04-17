@@ -16,6 +16,7 @@ class VideoCallPage extends StatefulWidget {
 }
 
 class _VideoCallPageState extends State<VideoCallPage> {
+  bool mic =true, video=true;
   InAppWebViewController _webViewController;
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
 
@@ -29,8 +30,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
         print(event.data().toString());
         if (event.data()['result'] == "accept") {
           print("accept");
-          _webViewController.evaluateJavascript(
-              source: "startCall('" + widget.targetUID + "')");
+          //_webViewController.evaluateJavascript(source: "startCall('" + widget.targetUID + "')");
         }
       });
     }
@@ -41,6 +41,40 @@ class _VideoCallPageState extends State<VideoCallPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text("Video Call"),
+          actions: [IconButton(icon: Icon(Icons.connect_without_contact), onPressed: (){
+            _webViewController.evaluateJavascript(source: "startCall('" + widget.targetUID + "')");
+          }),IconButton(icon: Icon(Icons.mic), onPressed: (){
+            mic = !mic;
+            _webViewController.evaluateJavascript(source: "toggleAudio('" + mic.toString() + "')");
+            if(mic == true){
+              final snackBar = SnackBar(
+                  content:
+                  Text('Turn On Microphone'));
+              Scaffold.of(context).showSnackBar(snackBar);
+
+            }else{
+              final snackBar = SnackBar(
+                  content:
+                  Text('Turn Off Microphone'));
+              Scaffold.of(context).showSnackBar(snackBar);
+            }
+
+          }), IconButton(icon: Icon(Icons.camera), onPressed: (){
+            video = !video;
+            _webViewController.evaluateJavascript(source: "toggleVideo('" + video.toString() + "')");
+            if(mic == true){
+              final snackBar = SnackBar(
+                  content:
+                  Text('Turn On Camera'));
+              Scaffold.of(context).showSnackBar(snackBar);
+
+            }else{
+              final snackBar = SnackBar(
+                  content:
+                  Text('Turn Off Camera'));
+              Scaffold.of(context).showSnackBar(snackBar);
+            }
+          })],
         ),
         body: Container(
             child: InAppWebView(
@@ -53,8 +87,7 @@ class _VideoCallPageState extends State<VideoCallPage> {
                   // it will print: {message: {"bar":"bar_value","baz":"baz_value"}, messageLevel: 1}
                 },
                 onLoadStop: (controller, url) {
-                  _webViewController.evaluateJavascript(
-                      source: "init('" + widget.UID + "')");
+                  _webViewController.evaluateJavascript(source: "init('" + widget.UID + "')");
                 },
                 initialOptions: InAppWebViewGroupOptions(
                   crossPlatform: InAppWebViewOptions(

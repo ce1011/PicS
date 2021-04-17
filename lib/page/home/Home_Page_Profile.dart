@@ -121,7 +121,7 @@ class HomePageProfile extends StatelessWidget {
                                       postDate: i.data()['postTime'],
                                       postID: i.id,
                                       description: i.data()['description'],
-                                      videoMode: i.data()['video']),
+                                      videoMode: i.data()['video'], canComment: true,),
                               ],
                             ),
                           ),

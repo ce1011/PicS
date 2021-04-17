@@ -9,9 +9,11 @@ import '../../firebase/Firebase_User_Data_Agent.dart';
 import '../../component/Post_View.dart';
 import '../profile/Profile_Edit_Page.dart';
 import '../chat/Chat_Page.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 
 class ProfilePage extends StatelessWidget {
   String UID;
+  FirebaseFunctions functions = FirebaseFunctions.instance;
 
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
 
@@ -40,6 +42,31 @@ class ProfilePage extends StatelessWidget {
         .then((data) => profileInformation = data.docs[0]);
 
     return profileInformation;
+  }
+
+  Future<Map<String, bool>> getPostCanData(String postID) async {
+    Map<String, bool> can = {'view': false, 'comment': false};
+
+    print("getCanData");
+    try {
+      await functions
+          .httpsCallable('viewPostAvalibility')
+          .call(<String, dynamic>{'postID': postID}).then((value) => {
+            print("canData is: " + value.data.toString()),
+        can['view'] = value.data['view'],
+        can['comment'] = value.data['comment']
+      });
+
+
+
+
+    } on FirebaseFunctionsException catch (e) {
+      print(
+          'Cloud functions exception with code: ${e.code}, and Details: ${e.details}, with message: ${e.message} ');
+    } catch (e) {
+      print(e.toString());
+    }
+    return can;
   }
 
   FirebaseUserDataAgent userAgent = new FirebaseUserDataAgent();
@@ -300,13 +327,25 @@ class ProfilePage extends StatelessWidget {
                               child: Column(
                                 children: [
                                   for (var i in snapshot.data)
-                                    PostView(
-                                      username: i.data()['UID'],
-                                      postDate: i.data()['postTime'],
-                                      postID: i.id,
-                                      description: i.data()['description'],
-                                      videoMode: i.data()['video'],
-                                    ),
+                                    FutureBuilder(future: getPostCanData(i.id) ,builder: (context, snapshotOfCan){
+                                      if(snapshot.hasData){
+                                        if(snapshotOfCan.data['view']){
+                                          return PostView(
+                                            username: i.data()['UID'],
+                                            postDate: i.data()['postTime'],
+                                            postID: i.id,
+                                            description: i.data()['description'],
+                                            videoMode: i.data()['video'],
+                                            canComment: snapshotOfCan.data['comment'],
+                                          );
+                                        }else{
+                                          return Container();
+                                        }
+                                      }else{
+                                        return Container();
+                                      }
+
+                                    })
                                 ],
                               ),
                             ),

@@ -37,6 +37,7 @@ class SettingPage extends StatelessWidget {
                   HttpsCallable callable =
                       FirebaseFunctions.instance.httpsCallable('deleteAccount');
                   final results = await callable();
+
                   if (results.data['status'] == "success") {
                     auth.signOut();
                   }

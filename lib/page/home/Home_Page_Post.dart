@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../component/Post_View.dart';
@@ -18,16 +20,21 @@ class _HomePagePostState extends State<HomePagePost> {
   FirebaseFirestore firestoreInstance = FirebaseFirestore.instance;
   FirebaseFunctions functions = FirebaseFunctions.instance;
 
-  Future<List<QueryDocumentSnapshot>> getPost() async {
+  Future<dynamic> getPost() async {
 
-    List<QueryDocumentSnapshot> postList;
+
+    dynamic postList;
+
+    /*
     CollectionReference post = firestoreInstance.collection("post");
     await post
         .orderBy("postTime", descending: true)
         .get()
-        .then((data) => postList = data.docs);
+        .then((data) => postList = data.docs);*/
 
-    //await functions.httpsCallable('getPostList').call().then((value) => print(value));
+    postList = await functions.httpsCallable('getPostList').call();
+
+    print("canComment: " + postList.data[0]['canComment'].toString());
 
     return postList;
 
@@ -35,10 +42,10 @@ class _HomePagePostState extends State<HomePagePost> {
 
     @override
     Widget build(BuildContext context) {
-      return FutureBuilder<List<QueryDocumentSnapshot>>(
+      return FutureBuilder(
           future: getPost(),
           builder: (BuildContext context,
-              AsyncSnapshot<List<QueryDocumentSnapshot>> snapshot) {
+              AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.done) {
               if (snapshot.hasError) {
                 return Text(snapshot.error.toString());
@@ -47,13 +54,15 @@ class _HomePagePostState extends State<HomePagePost> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        for (var i in snapshot.data)
+                        for (var i in snapshot.data.data)
                           PostView(
-                            username: i.data()['UID'],
-                            postDate: i.data()['postTime'],
-                            postID: i.id,
-                            description: i.data()['description'],
-                            videoMode: i.data()['video'],)
+                            username: i['UID'],
+                            postDate: Timestamp(i['postTimeSeconds'], i['postTimeNanoseconds']),
+                            //postDate: Timestamp(i['postTime']['_seconds'], i['postTime']['_nanoseconds']),
+                            postID: i['postID'],
+                            description: i['description'],
+                            videoMode: i['video'],
+                          canComment: i['canComment'])
                       ],
                     ),
                   ),

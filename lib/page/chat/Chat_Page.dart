@@ -614,14 +614,23 @@ class _ChatPageState extends State<ChatPage> {
                                 }
                               },
                             )),
-                        Expanded(
+                        Builder(builder: (context)=>                        Expanded(
                             child: IconButton(
                               icon: Icon(Icons.send),
                               onPressed: () {
                                 print("Text send Click");
-                                sendTextMessage(chatTextController.text);
+                                if(chatTextController.text.length > 0){
+                                  sendTextMessage(chatTextController.text);
+                                }else{
+                                  final snackBar = SnackBar(
+                                      content:
+                                      Text('Cannot send a empty string'));
+                                  Scaffold.of(context).showSnackBar(snackBar);
+                                }
+
                               },
-                            ))
+                            )))
+
                       ],
                     ),
                   ))

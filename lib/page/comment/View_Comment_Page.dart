@@ -15,9 +15,10 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class ViewCommentPage extends StatelessWidget {
   String postID, imageURL, postCreatorUID, videoURL;
-  bool videoMode;
+  bool videoMode, canComment;
 
-  ViewCommentPage({Key key, @required this.postID}) : super(key: key);
+  ViewCommentPage({Key key, @required this.postID, this.canComment})
+      : super(key: key);
 
   Uint8List photoByte;
   ImageProcess.Image photo;
@@ -78,7 +79,13 @@ class ViewCommentPage extends StatelessWidget {
   }
 
   @override
+
+
   Widget build(BuildContext context) {
+
+    final CommentArguments args =
+    ModalRoute.of(context).settings.arguments;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Comment"),
@@ -87,49 +94,34 @@ class ViewCommentPage extends StatelessWidget {
               future: getPostType(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Container(
-                    child: (!videoMode)
-                        ? IconButton(
-                            icon: Icon(Icons.add_comment),
-                            onPressed: () {
-                              print(postID);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CropPage(
-                                          photoByte: photoByte,
-                                          postID: postID,
-                                        )),
-                              );
-                            })
-                        : PopupMenuButton(
-                            icon: Icon(Icons.add_comment),
-                            itemBuilder: (context) {
-                              var commentType = List<PopupMenuEntry<Object>>();
-
-                              commentType.add(
-                                  PopupMenuItem(child: Text("Clip"), value: 1));
-
-                              return commentType;
-                            },
-                            onSelected: (value) async {
-                              switch (value) {
-                                case 1:
-                                  {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              VideoTrimmingPage(
-                                                url: videoURL,
-                                                postID: postID,
-                                              )),
-                                    );
-                                  }
-                              }
-                            },
-                          ),
-                  );
+                  return (args.canComment) ? Container(
+                      child: (!videoMode)
+                          ? IconButton(
+                              icon: Icon(Icons.add_comment),
+                              onPressed: () {
+                                print(postID);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CropPage(
+                                            photoByte: photoByte,
+                                            postID: postID,
+                                          )),
+                                );
+                              })
+                          : IconButton(
+                              icon: Icon(Icons.add_comment),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => VideoTrimmingPage(
+                                            url: videoURL,
+                                            postID: postID,
+                                          )),
+                                );
+                              },
+                            )) : Container();
                 } else {
                   return Container();
                 }
@@ -195,4 +187,10 @@ class ViewCommentPage extends StatelessWidget {
               ))),
     );
   }
+}
+
+class CommentArguments {
+  final bool canComment;
+
+  CommentArguments(this.canComment);
 }
