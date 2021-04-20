@@ -17,6 +17,7 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../firebase/Firebase_User_Data_Agent.dart';
 import 'VideoCall.dart';
+import 'VoiceCall.dart';
 
 import 'dart:typed_data';
 
@@ -213,6 +214,43 @@ class _ChatPageState extends State<ChatPage> {
     }
   }
 
+  Future<void> sendVoiceCallInvitation() async {
+    int temp_lastIndex;
+    if (lastIndex == null) {
+      temp_lastIndex = -1;
+    } else {
+      temp_lastIndex = lastIndex;
+    }
+
+    CollectionReference chatContentCollection = firestoreInstance
+        .collection("chatroom/" + widget.chatDocumentID + "/chatContent");
+
+    try {
+      await chatContentCollection.add({
+        'chatContentID': temp_lastIndex + 1,
+        'contentType': 5,
+        'result': 'unknown',
+        'sendAt': new Timestamp.now(),
+        'sendBy':
+        Provider.of<LoginStateNotifier>(context, listen: false).getUID()
+      }).then((value) =>
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    VoiceCallPage(
+                      Provider.of<LoginStateNotifier>(context,
+                          listen: false)
+                          .getUID(),
+                      0, watchChatContentDocument: value,
+                      targetUID: widget.uid,)),
+          )
+      );
+    } on FirebaseException catch (e) {
+      print("Error");
+    }
+  }
+
   Widget chatBubbleContent(int type, {String content, int chatContentID}) {
     switch (type) {
       case 0:
@@ -276,6 +314,67 @@ class _ChatPageState extends State<ChatPage> {
                         MaterialPageRoute(
                             builder: (context) =>
                                 VideoCallPage(
+                                    Provider.of<LoginStateNotifier>(context,
+                                        listen: false)
+                                        .getUID(),
+                                    1)),
+                      );
+
+                      Future.delayed(new Duration(seconds: 1, milliseconds: 500), (){
+                        firestoreInstance
+                            .collection("chatroom/" +
+                            widget.chatDocumentID +
+                            "/chatContent")
+                            .where('chatContentID', isEqualTo: chatContentID)
+                            .get()
+                            .then((value) =>
+                            firestoreInstance
+                                .collection("chatroom/" +
+                                widget.chatDocumentID +
+                                "/chatContent")
+                                .doc(value.docs.first.id)
+                                .update({'result': 'accept'}));
+                      });
+
+
+
+                    },
+                    child: Text("Accept")),
+                RaisedButton(
+                  onPressed: () async {
+                    await firestoreInstance
+                        .collection("chatroom/" +
+                        widget.chatDocumentID +
+                        "/chatContent")
+                        .where('chatContentID', isEqualTo: chatContentID)
+                        .get()
+                        .then((value) =>
+                        firestoreInstance
+                            .collection("chatroom/" +
+                            widget.chatDocumentID +
+                            "/chatContent")
+                            .doc(value.docs.first.id)
+                            .update({'result': 'decline'}));
+                  },
+                  child: Text("Decline"),
+                )
+              ],
+            ),
+          );
+        }
+      case 5:
+        {
+          return Container(
+            child: Column(
+              children: [
+                Text("Voice Call Acceptation"),
+                RaisedButton(
+                    onPressed: () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                VoiceCallPage(
                                     Provider.of<LoginStateNotifier>(context,
                                         listen: false)
                                         .getUID(),
@@ -421,7 +520,9 @@ class _ChatPageState extends State<ChatPage> {
           actions: [
             IconButton(
               icon: Icon(Icons.phone),
-              onPressed: () {},
+              onPressed: () {
+                sendVoiceCallInvitation();
+              },
             ),
             IconButton(
               icon: Icon(Icons.video_call),

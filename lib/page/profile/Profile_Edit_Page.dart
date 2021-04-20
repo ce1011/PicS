@@ -136,8 +136,8 @@ class ProfileEditPage extends StatelessWidget {
                 } else {
                   return InkWell(
                     child: Container(
-                      height: 400,
-                      width: 400,
+                      height: 200,
+                      width: 200,
                       decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
@@ -160,7 +160,6 @@ class ProfileEditPage extends StatelessWidget {
             ),
             Center(
               child: TextField(
-                key: UniqueKey(),
                 controller: displayNameInputController,
                 decoration: InputDecoration(
                   labelText: "Display Name",
@@ -172,7 +171,6 @@ class ProfileEditPage extends StatelessWidget {
               ),
             ),
             TextFormField(
-              key: UniqueKey(),
               decoration: const InputDecoration(
                 hintText: 'Description',
               ),
