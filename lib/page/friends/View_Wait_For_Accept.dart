@@ -54,13 +54,14 @@ class _ViewWaitForAcceptPageState extends State<ViewWaitForAcceptPage> {
                                       color: Colors.green,
                                       icon: Icons.add,
                                       onTap: () {
+                                        print(i);
                                         firestoreInstance
                                             .collection("groupDB/" +
                                             Provider.of<LoginStateNotifier>(context,
                                                 listen: false)
                                                 .getUID() +
                                             "/groups")
-                                            .doc("waitForUserAccept")
+                                            .doc("waitForAccept")
                                             .update({'UID.' + i: FieldValue.delete()});
 
                                         firestoreInstance
@@ -104,7 +105,7 @@ i +
                                                 listen: false)
                                                 .getUID() +
                                             "/groups")
-                                            .doc("waitForTargetUserAccept")
+                                            .doc("waitForAccept")
                                             .update({'UID.' + i: FieldValue.delete()});
 
                                         firestoreInstance

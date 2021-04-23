@@ -76,14 +76,8 @@ lastIndex = -1;
                   Navigator.popUntil(context, (route) {
                     return count++ == 2;
                   });
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ViewCommentPage(
-                              postID: postID,
-                            )),
-                  );
+                  Navigator.pushNamed(
+                      context, "/post/${postID}/comment", arguments: CommentArguments(true));
                 } else {
                   print("error");
                 }

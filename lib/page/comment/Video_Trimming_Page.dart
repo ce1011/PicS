@@ -95,14 +95,8 @@ class _VideoTrimmingPageState extends State<VideoTrimmingPage> {
                     return count++ == 2;
                   });
 
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            ViewCommentPage(
-                              postID: widget.postID,
-                            )),
-                  );
+                  Navigator.pushNamed(
+                      context, "/post/${widget.postID}/comment", arguments: CommentArguments(true));
                 } else {
                   print("error");
                 }
