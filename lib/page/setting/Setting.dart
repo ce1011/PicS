@@ -32,13 +32,15 @@ class SettingPage extends StatelessWidget {
                     .darkMode,
               ),
               ListTile(
-                title: Text("Delete Account (Not Finish))"),
+                title: Text("Delete Account"),
                 onTap: () async {
                   HttpsCallable callable =
                       FirebaseFunctions.instance.httpsCallable('deleteAccount');
+
                   final results = await callable();
 
                   if (results.data['status'] == "success") {
+                    auth.currentUser.delete();
                     auth.signOut();
                   }
                 },

@@ -41,8 +41,13 @@ class _PickImagePageState extends State<PickImagePage> {
       result = await FilePicker.platform
           .pickFiles(type: FileType.custom, withData: true, allowedExtensions: ['jpg','png'],);
     }else{
-      result = await FilePicker.platform
-          .pickFiles(type: FileType.custom, withData: true, allowedExtensions: ['jpg','png','mp4']);
+      if(Platform.isIOS){
+        result = await FilePicker.platform
+            .pickFiles(type: FileType.media, withData: true);
+      }else if(Platform.isAndroid){
+        result = await FilePicker.platform
+            .pickFiles(type: FileType.custom, withData: true, allowedExtensions: ['jpg','png','mp4']);
+      }
 
     }
 
