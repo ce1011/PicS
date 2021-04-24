@@ -34,15 +34,13 @@ class SettingPage extends StatelessWidget {
               ListTile(
                 title: Text("Delete Account"),
                 onTap: () async {
-                  HttpsCallable callable =
-                      FirebaseFunctions.instance.httpsCallable('deleteAccount');
+                  HttpsCallable callable = FirebaseFunctions.instance.httpsCallable('deleteAccount');
 
                   final results = await callable();
 
-                  if (results.data['status'] == "success") {
-                    auth.currentUser.delete();
-                    auth.signOut();
-                  }
+                  auth.currentUser.delete();
+
+                  Navigator.pushReplacementNamed(context, "/");
                 },
               )
             ],

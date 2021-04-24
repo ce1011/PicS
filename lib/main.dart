@@ -40,6 +40,7 @@ class MyApp extends StatelessWidget {
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
           return MaterialApp(
+            debugShowCheckedModeBanner:false,
             title: 'PicS',
             theme: Provider.of<BrightnessNotifier>(context, listen: true)
                     .darkMode
